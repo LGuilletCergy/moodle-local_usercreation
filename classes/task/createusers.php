@@ -76,7 +76,7 @@ class createusers extends \core\task\scheduled_task {
         $xpathvar = new \Domxpath($xmldoc);
         $liststudents = $xpathvar->query('//Student');
 
-        foreach($liststudents as $student) {
+        foreach ($liststudents as $student) {
 
             $this->studentline($student);
         }
@@ -87,7 +87,7 @@ class createusers extends \core\task\scheduled_task {
         $studentuid = $student->getAttribute('StudentUID');
         echo 'studentuid = '.$studentuid."\n";
 
-        if ($studentuid){
+        if ($studentuid) {
 
             $email = $student->getAttribute('StudentEmail');
             $idnumber = $student->getAttribute('StudentETU');
@@ -161,7 +161,7 @@ class createusers extends \core\task\scheduled_task {
     private function updateuser($rolename, $username, $idnumber, $firstname, $lastname, $email) {
 
         global $DB;
-        $userdata = $DB->get_record('user', array('username'=> $username));
+        $userdata = $DB->get_record('user', array('username' => $username));
         $userdata->firstname = $firstname;
         $userdata->lastname = $lastname;
         $userdata->idnumber = $idnumber;
@@ -171,7 +171,7 @@ class createusers extends \core\task\scheduled_task {
         $systemcontext = \context_system::instance();
         $role = $DB->get_record('role', array('shortname' => $rolename));
         $assigned = $DB->record_exists('role_assignments', array('roleid' => $role->id,
-            'contextid' => $systemcontext->id ,'userid' => $userdata->id));
+            'contextid' => $systemcontext->id, 'userid' => $userdata->id));
 
         if (!$assigned) {
 
@@ -338,7 +338,7 @@ class createusers extends \core\task\scheduled_task {
         $xpathvar = new \Domxpath($xmldoc);
         $listteachers = $xpathvar->query('//Teacher');
 
-        foreach($listteachers as $teacher){
+        foreach ($listteachers as $teacher){
 
             $this->teacherline($teacher);
         }
@@ -500,7 +500,7 @@ class createusers extends \core\task\scheduled_task {
         $xpathvar = new \Domxpath($xmldoc);
         $liststaff = $xpathvar->query('//Composante/Individu');
 
-        foreach($liststaff as $staff){
+        foreach ($liststaff as $staff) {
 
             $this->staffline($staff);
         }

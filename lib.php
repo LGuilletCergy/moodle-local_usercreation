@@ -40,11 +40,16 @@ require_once($CFG->dirroot.'/group/lib.php');
  * @param context $context
  */
 function local_usercreation_extend_navigation(global_navigation $nav) {
-	global $DB, $USER;
-	if ($USER && isset($USER->username)) {
-		$hastwin = $DB->record_exists('local_usercreation_twins', array('username' => $USER->username));
-		if ($hastwin) {
-			header('Location: https://sefiap.u-cergy.fr');
-		}
-	}
+
+    global $DB, $USER;
+
+    if ($USER && isset($USER->username)) {
+
+        $hastwin = $DB->record_exists('local_usercreation_twins', array('username' => $USER->username));
+
+        if ($hastwin) {
+
+            header('Location: https://sefiap.u-cergy.fr');
+        }
+    }
 }
