@@ -338,7 +338,7 @@ class createusers extends \core\task\scheduled_task {
         $xpathvar = new \Domxpath($xmldoc);
         $listteachers = $xpathvar->query('//Teacher');
 
-        foreach ($listteachers as $teacher){
+        foreach ($listteachers as $teacher) {
 
             $this->teacherline($teacher);
         }
