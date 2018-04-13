@@ -21,18 +21,37 @@
  * 95011 Cergy-Pontoise cedex
  * FRANCE
  *
- * Create the accounts of students and teachers based on xml files and fill tables used for statistics.
+ * Create the accounts of students, teachers and staff based on xml files and fill tables used for statistics.
  *
  * @package   local_usercreation
  * @copyright 2017 Laurent Guillet <laurent.guillet@u-cergy.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * File : version.php
- * Version file
+ * File : upgrade.php
+ * Upgrade file
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->component = 'local_usercreation';
-$plugin->version = 2018041300;
-$plugin->requires = 2017111300;
+function xmldb_local_usecreation_upgrade($oldversion) {
+    global $CFG, $DB;
+
+    $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
+
+    if ($oldversion < 2018041300) {
+
+        // Define field fixed to be added to local_usercreation_twins.
+        $table = new xmldb_table('local_usercreation_twins');
+        $field = new xmldb_field('fixed', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'username');
+
+        // Conditionally launch add field fixed.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Usercreation savepoint reached.
+        upgrade_plugin_savepoint(true, 2018041300, 'local', 'usercreation');
+    }
+
+    return true;
+}

@@ -48,9 +48,25 @@ class createusers extends \core\task\scheduled_task {
 
     public function execute() {
 
+        $this->fixtwins();
         $this->createstudents();
         $this->createteachers();
         $this->createstaff();
+        $this->deletefixedtwins();
+    }
+
+    private function fixtwins() {
+
+        global $DB;
+
+        $listtwins = $DB->get_records('local_usercreation_twins', array());
+
+        foreach ($listtwins as $twin) {
+
+            $twin->fixed = 1;
+
+            $DB->update_record('local_usercreation_twins', $twin);
+        }
     }
 
     private function createstudents() {
@@ -92,7 +108,8 @@ class createusers extends \core\task\scheduled_task {
 
                 if ($year == $configyear) {
 
-                    $this->processstudent($studentuid, $idnumber, $firstname, $lastname, $email, $universityyear);
+                    $this->processstudent($studentuid, $idnumber, $firstname,
+                            $lastname, $email, $universityyear);
                 }
             }
         }
@@ -102,12 +119,33 @@ class createusers extends \core\task\scheduled_task {
 
         global $DB;
 
-        $user = $DB->get_record('user', array('username'=>$studentuid, 'idnumber' => $idnumber));
+        $user = $DB->get_record('user', array('username' => $studentuid));
         if ($user) {
 
-            //TODO : Gérer les doublons.
+            if ($user->idnumber == $idnumber) {
 
-            $this->updateuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
+                // Même utilisateur.
+
+                $this->updateuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
+            } else {
+
+                // Doublon.
+
+                if ($DB->record_exists('local_usercreation_twins', array('username' => $studentuid))) {
+
+                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $studentuid));
+                    $twin->fixed = 0;
+
+                    $DB->update_record('local_usercreation_twins', $twin);
+                } else {
+
+                    $twin = new stdClass();
+                    $twin->username = $studentuid;
+                    $twin->fixed = 0;
+
+                    $DB->insert_record('local_usercreation_twins', $twin);
+                }
+            }
         } else {
 
             $user = $this->newuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
@@ -214,8 +252,8 @@ class createusers extends \core\task\scheduled_task {
             $ufrcode = substr($codeetape, 0, 1);
             $ufrcodeyear = "Y$year-$ufrcode";
 
-            //Si cette inscription de l'utilisateur à cette composante
-            // n'est pas encore dans mdl_local_ufrstudent, on l'y ajoute
+            // Si cette inscription de l'utilisateur à cette composante
+            // n'est pas encore dans mdl_local_ufrstudent, on l'y ajoute.
             $nbufrstudent = $DB->count_records('local_usercreation_ufr',
                     array('userid' => $user->id, 'ufrcode' => $ufrcodeyear));
             if ($nbufrstudent == 0) {
@@ -235,7 +273,7 @@ class createusers extends \core\task\scheduled_task {
                 }
             }
 
-            //idem pour la VET
+            // Idem pour la VET.
 
             $nbstudentvet = $DB->count_records('local_usercreation_vet',
                     array('studentid' => $user->id, 'vetcode' => $codeetapeyear));
@@ -257,7 +295,7 @@ class createusers extends \core\task\scheduled_task {
             }
         }
 
-        // Supprimer les anciennes ufr/vet
+        // Supprimer les anciennes ufr/vet.
         $this->cleanufrvet($listtempstudentufr, $listtempstudentvet, $user);
     }
 
@@ -313,7 +351,14 @@ class createusers extends \core\task\scheduled_task {
         if ($teacheruid) {
 
             $email = $teacher->getAttribute('StaffEmail');
-            $idnumber = $teacher->getAttribute('StaffETU');
+
+            if ($teacher->hasAttribute('StaffETU')) {
+
+                $idnumber = $teacher->getAttribute('StaffETU');
+            } else {
+
+                $idnumber = $teacher->getAttribute('StaffCode');
+            }
             $lastname = ucwords(strtolower($teacher->getAttribute('StaffCommonName')));
             $firstname = ucwords(strtolower($teacher->getAttribute('StaffFirstName')));
             $affectations = $teacher->childNodes;
@@ -345,7 +390,30 @@ class createusers extends \core\task\scheduled_task {
 
         if ($user) {
 
-            $this->updateuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
+            if ($user->idnumber == $idnumber) {
+
+                // Même utilisateur.
+
+                $this->updateuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
+            } else {
+
+                // Doublon.
+
+                if ($DB->record_exists('local_usercreation_twins', array('username' => $teacheruid))) {
+
+                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $teacheruid));
+                    $twin->fixed = 0;
+
+                    $DB->update_record('local_usercreation_twins', $twin);
+                } else {
+
+                    $twin = new stdClass();
+                    $twin->username = $teacheruid;
+                    $twin->fixed = 0;
+
+                    $DB->insert_record('local_usercreation_twins', $twin);
+                }
+            }
         } else {
 
             $user = $this->newuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
@@ -359,7 +427,7 @@ class createusers extends \core\task\scheduled_task {
 
         global $DB;
 
-        // Ici, gérer local_usercreation_ufr et local_usercreation_type
+        // Ici, gérer local_usercreation_ufr et local_usercreation_type.
 
         $teacherdata = $DB->get_record('user',
                 array('username' => $teacher->getAttribute('StaffUID')));
@@ -445,7 +513,14 @@ class createusers extends \core\task\scheduled_task {
         if ($staffuid) {
 
             $email = $staff->getAttribute('MAIL');
-            $idnumber = $staff->getAttribute('NO_INDIVIDU');
+
+            if ($staff->hasAttribute('StaffETU')) {
+
+                $idnumber = $staff->getAttribute('StaffETU');
+            } else {
+
+                $idnumber = $staff->getAttribute('NO_INDIVIDU');
+            }
             $lastname = ucwords(strtolower($staff->getAttribute('NOM_USUEL')));
             $firstname = ucwords(strtolower($staff->getAttribute('PRENOM')));
 
@@ -461,10 +536,40 @@ class createusers extends \core\task\scheduled_task {
 
         if ($user) {
 
-            $this->updateuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
+            if ($user->idnumber == $idnumber) {
+
+                // Même utilisateur.
+
+                $this->updateuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
+            } else {
+
+                // Doublon.
+
+                if ($DB->record_exists('local_usercreation_twins', array('username' => $staffuid))) {
+
+                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $staffuid));
+                    $twin->fixed = 0;
+
+                    $DB->update_record('local_usercreation_twins', $twin);
+                } else {
+
+                    $twin = new stdClass();
+                    $twin->username = $staffuid;
+                    $twin->fixed = 0;
+
+                    $DB->insert_record('local_usercreation_twins', $twin);
+                }
+            }
         } else {
 
             $user = $this->newuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
         }
+    }
+
+    private function deletefixedtwins() {
+
+        global $DB;
+
+        $DB->delete_records('local_usercreation_twins', array('fixed' => 1));
     }
 }
