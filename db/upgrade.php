@@ -33,7 +33,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-function xmldb_local_usecreation_upgrade($oldversion) {
+function xmldb_local_usercreation_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
@@ -48,6 +48,9 @@ function xmldb_local_usecreation_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+
+        // Usercreation savepoint reached.
+        upgrade_plugin_savepoint(true, 2018041300, 'local', 'usercreation');
     }
 
     return true;
