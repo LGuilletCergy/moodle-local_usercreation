@@ -48,9 +48,6 @@ function xmldb_local_usecreation_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-
-        // Usercreation savepoint reached.
-        upgrade_plugin_savepoint(true, 2018041300, 'local', 'usercreation');
     }
 
     return true;
