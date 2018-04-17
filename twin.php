@@ -26,37 +26,18 @@
  * @copyright 2018 Brice Errandonea <brice.errandonea@u-cergy.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * File : lib.php
- * Functions library
+ * File : twin.php
+ * Tell the user he cannot use the site.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once("$CFG->dirroot/course/lib.php");
-require_once("$CFG->dirroot/group/lib.php");
+require_once("../../config.php");
 
-function local_usercreation_extend_navigation(global_navigation $nav) {
+$context = context_system::instance();
 
-    global $DB, $USER;
+$PAGE->set_context($context);
 
-    $twinpageurl = new moodle_url('/local/usercreation/twin.php');
+echo $OUTPUT->header();
 
-    if ($this->page->url == $twinpageurl) {
+echo get_string('youretwin', 'local_usercreation');
 
-        $ontwinpage = true;
-    } else {
-
-        $ontwinpage = false;
-    }
-
-    if ($USER && isset($USER->username) && !$ontwinpage) {
-
-        $hastwin = $DB->record_exists('local_usercreation_twins', array('username' => $USER->username));
-
-        if ($hastwin) {
-
-            $redirecturl = new moodle_url('twin.php');
-
-            redirect($redirecturl);
-        }
-    }
-}
+echo $OUTPUT->footer();
