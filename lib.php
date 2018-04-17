@@ -36,13 +36,21 @@ require_once("$CFG->dirroot/group/lib.php");
 
 function local_usercreation_extend_navigation(global_navigation $nav) {
 
-    global $DB, $USER;
+    global $DB, $USER, $PAGE;
 
-    $twinpageurl = new moodle_url('/local/usercreation/twin.php');
+    if ($PAGE->has_set_url()) {
 
-    if ($this->page->url == $twinpageurl) {
+        $url = $PAGE->url;
 
-        $ontwinpage = true;
+        $twinpageurl = new moodle_url('/local/usercreation/twin.php');
+
+        if ($url == $twinpageurl) {
+
+            $ontwinpage = true;
+        } else {
+
+            $ontwinpage = false;
+        }
     } else {
 
         $ontwinpage = false;
@@ -54,7 +62,7 @@ function local_usercreation_extend_navigation(global_navigation $nav) {
 
         if ($hastwin) {
 
-            $redirecturl = new moodle_url('twin.php');
+            $redirecturl = new moodle_url('/local/usercreation/twin.php');
 
             redirect($redirecturl);
         }

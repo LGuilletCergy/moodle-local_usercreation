@@ -27,7 +27,7 @@
  * @copyright 2017 Laurent Guillet <laurent.guillet@u-cergy.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * File : lang/fr/locat_usercreation.php
+ * File : lang/fr/local_usercreation.php
  * French language file
  */
 
@@ -36,3 +36,6 @@ $string['createstudents'] = "Création des comptes étudiants";
 $string['createstaff'] = "Création des comptes personnels";
 $string['pluginname'] = "Création des utilisateurs";
 $string['year'] = "Année à utiliser pour la création des comptes étudiants";
+$string['youretwin'] = 'Un autre utilisateur a le même identifiant que vous.'
+        . 'En conséquence, nous sommes incapable de vous distinguer.<br>'
+        . 'Veuillez contacter la DISI pour résoudre ce problème.';

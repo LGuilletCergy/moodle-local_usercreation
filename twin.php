@@ -32,6 +32,12 @@
 
 require_once("../../config.php");
 
+require_login();
+
+$pageurl = new moodle_url('/local/usercreation/twin.php');
+
+$PAGE->set_url($pageurl);
+
 $context = context_system::instance();
 
 $PAGE->set_context($context);
