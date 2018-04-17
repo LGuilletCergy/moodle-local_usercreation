@@ -36,7 +36,7 @@ $string['createstudents'] = "Create students accounts";
 $string['createstaff'] = "Create staff accounts";
 $string['pluginname'] = "Creation of users accounts";
 $string['year'] = "Year to use when creating students accounts";
-$string['youretwin'] = 'Another user has the same user than you. '
-        . 'As such, we are unable to distinguish between the two of you.<br>'
+$string['youretwin'] = '<br>Another user has the same user than you.'
+        . ' As such, we are unable to distinguish between the two of you.<br>'
         . '<br>'
         . 'Please contact the DISI to solve this problem.';
