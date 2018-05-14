@@ -37,5 +37,5 @@ $string['createstaff'] = "Création des comptes personnels";
 $string['pluginname'] = "Création des utilisateurs";
 $string['year'] = "Année à utiliser pour la création des comptes étudiants";
 $string['youretwin'] = '<br>Un autre utilisateur a le même identifiant que vous.'
-        . ' En conséquence, nous sommes incapable de vous distinguer.<br>'
+        . ' En conséquence, nous somme incapable de vous distinguer.<br>'
         . 'Veuillez contacter la DISI pour résoudre ce problème.';
