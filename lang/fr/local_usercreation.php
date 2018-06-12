@@ -34,6 +34,7 @@
 $string['createteachers'] = "Création des comptes professeurs";
 $string['createstudents'] = "Création des comptes étudiants";
 $string['createstaff'] = "Création des comptes personnels";
+$string['createuser'] = "Création de tout les comptes";
 $string['pluginname'] = "Création des utilisateurs";
 $string['year'] = "Année à utiliser pour la création des comptes étudiants";
 $string['youretwin'] = '<br>Un autre utilisateur a le même identifiant que vous.'

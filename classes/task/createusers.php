@@ -282,6 +282,7 @@ class createusers extends \core\task\scheduled_task {
                 $studentvetrecord = new \stdClass();
                 $studentvetrecord->studentid = $user->id;
                 $studentvetrecord->vetcode = $codeetapeyear;
+                $studentvetrecord->vetname = $yearenrolment->getAttribute('LibEtape');
                 $DB->insert_record('local_usercreation_vet', $studentvetrecord);
             } else {
 
