@@ -499,7 +499,7 @@ class createusers extends \core\task\scheduled_task {
         $xmldoc = new \DOMDocument();
         $xmldoc->load('/home/referentiel/sefiap_personnel_composante.xml');
         $xpathvar = new \Domxpath($xmldoc);
-        $liststaff = $xpathvar->query('//Composante/Individu');
+        $liststaff = $xpathvar->query('//Composante/Service/Individu');
 
         foreach ($liststaff as $staff) {
 
