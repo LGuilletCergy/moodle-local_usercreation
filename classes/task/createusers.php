@@ -139,7 +139,7 @@ class createusers extends \core\task\scheduled_task {
                     $DB->update_record('local_usercreation_twins', $twin);
                 } else {
 
-                    $twin = new stdClass();
+                    $twin = new \stdClass();
                     $twin->username = $studentuid;
                     $twin->fixed = 0;
 
@@ -182,7 +182,7 @@ class createusers extends \core\task\scheduled_task {
     private function newuser($rolename, $studentuid, $idnumber, $firstname, $lastname, $email) {
 
         global $DB;
-        $user = new \StdClass();
+        $user = new \stdClass();
         $user->auth = 'cas';
         $user->confirmed = 1;
         $user->mnethostid = 1;
@@ -228,7 +228,7 @@ class createusers extends \core\task\scheduled_task {
 
         foreach ($liststudentvet as $studentvet) {
 
-            $tempstudentvet = new stdClass();
+            $tempstudentvet = new \stdClass();
             $tempstudentvet->vetcode = $studentvet->vetcode;
             $tempstudentvet->stillexists = 0;
             $listtempstudentvet[] = $tempstudentvet;
@@ -408,7 +408,7 @@ class createusers extends \core\task\scheduled_task {
                     $DB->update_record('local_usercreation_twins', $twin);
                 } else {
 
-                    $twin = new stdClass();
+                    $twin = new \stdClass();
                     $twin->username = $teacheruid;
                     $twin->fixed = 0;
 
@@ -554,7 +554,7 @@ class createusers extends \core\task\scheduled_task {
                     $DB->update_record('local_usercreation_twins', $twin);
                 } else {
 
-                    $twin = new stdClass();
+                    $twin = new \stdClass();
                     $twin->username = $staffuid;
                     $twin->fixed = 0;
 
