@@ -122,7 +122,7 @@ class createusers extends \core\task\scheduled_task {
         $user = $DB->get_record('user', array('username' => $studentuid));
         if ($user) {
 
-            if ($user->idnumber == $idnumber) {
+            if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
 
@@ -391,7 +391,7 @@ class createusers extends \core\task\scheduled_task {
 
         if ($user) {
 
-            if ($user->idnumber == $idnumber) {
+            if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
 
@@ -537,7 +537,7 @@ class createusers extends \core\task\scheduled_task {
 
         if ($user) {
 
-            if ($user->idnumber == $idnumber) {
+            if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
 
