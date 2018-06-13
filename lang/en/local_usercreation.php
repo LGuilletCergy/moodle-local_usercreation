@@ -31,10 +31,7 @@
  * English language file
  */
 
-$string['createteachers'] = "Create teachers accounts";
-$string['createstudents'] = "Create students accounts";
-$string['createstaff'] = "Create staff accounts";
-$string['createuser'] = "Create all users accounts";
+$string['usercreation:createusers'] = "Create all users accounts";
 $string['pluginname'] = "Creation of users accounts";
 $string['year'] = "Year to use when creating students accounts";
 $string['youretwin'] = '<br>Another user has the same user than you.'

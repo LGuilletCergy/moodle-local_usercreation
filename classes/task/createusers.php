@@ -27,8 +27,8 @@
  * @copyright 2017 Laurent Guillet <laurent.guillet@u-cergy.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * File : createstudents.php
- * Create the students account
+ * File : createusers.php
+ * Create all users account
  */
 
 namespace local_usercreation\task;
