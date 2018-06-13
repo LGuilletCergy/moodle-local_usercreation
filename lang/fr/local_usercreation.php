@@ -31,7 +31,7 @@
  * French language file
  */
 
-$string['usercreation:createusers'] = "Création de tout les comptes";
+$string['createusers'] = "Création de tout les comptes";
 $string['pluginname'] = "Création des utilisateurs";
 $string['year'] = "Année à utiliser pour la création des comptes étudiants";
 $string['youretwin'] = '<br>Un autre utilisateur a le même identifiant que vous.'
