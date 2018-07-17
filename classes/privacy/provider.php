@@ -86,7 +86,7 @@ class provider implements
 
         $contextlist = new \core_privacy\local\request\contextlist();
 
-        $sql = "SELECT c.id FROM {context} WHERE (contextlevel = :contextlevel)";
+        $sql = "SELECT id FROM {context} WHERE (contextlevel = :contextlevel)";
 
         $params = [
             'contextlevel' => CONTEXT_SYSTEM,
