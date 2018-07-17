@@ -30,6 +30,7 @@
   * File : provider.php
  * RGPD file
  */
+
 namespace local_usercreation\privacy;
 
 defined('MOODLE_INTERNAL') || die();
