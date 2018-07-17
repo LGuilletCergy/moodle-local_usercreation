@@ -38,3 +38,13 @@ $string['youretwin'] = '<br>Another user has the same user than you.'
         . ' As such, we are unable to distinguish between the two of you.<br>'
         . '<br>'
         . 'Please contact the DISI to solve this problem.';
+$string['privacy:metadata:local_usercreation_type'] = 'Table storing the type of teacher of the user.';
+$string['privacy:metadata:local_usercreation_type:userid'] = 'User ID';
+$string['privacy:metadata:local_usercreation_type:typeteacher'] = 'Teacher type of the user.';
+$string['privacy:metadata:local_usercreation_vet'] = 'Table storing the VET of the user.';
+$string['privacy:metadata:local_usercreation_vet:studentid'] = 'Student ID';
+$string['privacy:metadata:local_usercreation_vet:vetname'] = 'Name of the VET.';
+$string['privacy:metadata:local_usercreation_vet:vetcode'] = 'Code of the VET.';
+$string['privacy:metadata:local_usercreation_ufr'] = 'Table storing the UFR of the user.';
+$string['privacy:metadata:local_usercreation_ufr:userid'] = 'User ID.';
+$string['privacy:metadata:local_usercreation_ufr:ufrcode'] = 'Code of the UFR.';

@@ -37,3 +37,14 @@ $string['year'] = "Année à utiliser pour la création des comptes étudiants";
 $string['youretwin'] = '<br>Un autre utilisateur a le même identifiant que vous.'
         . ' En conséquence, nous somme incapable de vous distinguer.<br>'
         . 'Veuillez contacter la DISI pour résoudre ce problème.';
+$string['privacy:metadata:local_usercreation_type'] = 'Table des types d\'enseignants.';
+$string['privacy:metadata:local_usercreation_type:userid'] = 'ID de l\'utilisateur.';
+$string['privacy:metadata:local_usercreation_type:typeteacher'] = 'Type d\'enseignant'
+        . ' de l\'utilisateur.';
+$string['privacy:metadata:local_usercreation_vet'] = 'Table des VETs des utilisateurs.';
+$string['privacy:metadata:local_usercreation_vet:studentid'] = 'ID de l\'étudiant.';
+$string['privacy:metadata:local_usercreation_vet:vetname'] = 'Nom de la VET.';
+$string['privacy:metadata:local_usercreation_vet:vetcode'] = 'Code de la VET.';
+$string['privacy:metadata:local_usercreation_ufr'] = 'Table des UFRs des utilisateurs.';
+$string['privacy:metadata:local_usercreation_ufr:userid'] = 'ID de l\'utilisateur.';
+$string['privacy:metadata:local_usercreation_ufr:ufrcode'] = 'Code de l\'UFR.';
