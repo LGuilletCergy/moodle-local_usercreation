@@ -93,6 +93,8 @@ class provider implements
         ];
 
         $contextlist->add_from_sql($sql, $params);
+
+        return $contextlist;
     }
 
     public static function export_user_data(approved_contextlist $contextlist) {
