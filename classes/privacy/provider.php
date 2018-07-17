@@ -39,7 +39,8 @@ use core_privacy\local\metadata\collection;
 
 class provider implements
         // This plugin does store personal user data.
-        \core_privacy\local\metadata\provider {
+        \core_privacy\local\metadata\provider,
+        \core_privacy\local\request\plugin\provider {
 
     public static function get_metadata(collection $collection) : collection {
 
