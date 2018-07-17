@@ -30,10 +30,10 @@
   * File : provider.php
  * RGPD file
  */
+namespace local_usercreation\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
-namespace local_usercreation\privacy;
 use core_privacy\local\metadata\collection;
 
 class provider implements
