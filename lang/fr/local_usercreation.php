@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,13 +31,13 @@
  * File : lang/fr/local_usercreation.php
  * French language file
  */
-
 $string['createusers'] = "Création de tout les comptes";
 $string['pluginname'] = "Création des utilisateurs";
 $string['year'] = "Année à utiliser pour la création des comptes étudiants";
-$string['youretwin'] = '<br>Un autre utilisateur a le même identifiant que vous.'
-        . ' En conséquence, nous somme incapable de vous distinguer.<br>'
-        . 'Veuillez contacter la DISI pour résoudre ce problème.';
+$string['youretwin'] = '<br>UUn autre utilisateur a le même identifiant que vous.'
+        . ' En conséquence, nous sommes pas en mesure de vous distinguer.<br>'
+        . 'Un message vient d\'être envoyé aux services compétents pour signaler ce problème.'
+        . ' Vous (ou l\'autre utilisateur) recevrez bientôt un nouvel identifiant.';
 $string['privacy:metadata:local_usercreation_type'] = 'Table des types d\'enseignants.';
 $string['privacy:metadata:local_usercreation_type:userid'] = 'ID de l\'utilisateur.';
 $string['privacy:metadata:local_usercreation_type:typeteacher'] = 'Type d\'enseignant'

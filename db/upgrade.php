@@ -52,6 +52,46 @@ function xmldb_local_usercreation_upgrade($oldversion) {
         // Usercreation savepoint reached.
         upgrade_plugin_savepoint(true, 2018041300, 'local', 'usercreation');
     }
+	
+	if ($oldversion < 2018082901) {
+
+        // Define field stillexists to be added to local_usercreation_vet.
+        $table = new xmldb_table('local_usercreation_vet');
+        $field = new xmldb_field('stillexists', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'vetcode');
+
+        // Conditionally launch add field stillexists.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+		
+		// Define field stillexists to be added to local_usercreation_ufr.
+        $table = new xmldb_table('local_usercreation_ufr');
+        $field = new xmldb_field('stillexists', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'ufrcode');
+
+        // Conditionally launch add field stillexists.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+		}
+
+        // Usercreation savepoint reached.
+        upgrade_plugin_savepoint(true, 2018082901, 'local', 'usercreation');
+    }
+	
+	if ($oldversion < 2018090600) {
+
+        // Define field checkedon to be added to local_usercreation_twins.
+        $table = new xmldb_table('local_usercreation_twins');
+        $field = new xmldb_field('checkedon', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'fixed');
+
+        // Conditionally launch add field checkedon.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Usercreation savepoint reached.
+        upgrade_plugin_savepoint(true, 2018090600, 'local', 'usercreation');
+    }
+
 
     return true;
 }

@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,14 +31,13 @@
  * File : lang/en/local_usercreation.php
  * English language file
  */
-
 $string['createusers'] = "Create all users accounts";
 $string['pluginname'] = "Creation of users accounts";
 $string['year'] = "Year to use when creating students accounts";
 $string['youretwin'] = '<br>Another user has the same user than you.'
         . ' As such, we are unable to distinguish between the two of you.<br>'
         . '<br>'
-        . 'Please contact the DISI to solve this problem.';
+        . 'The appropriate service has been contacted about this problem.';
 $string['privacy:metadata:local_usercreation_type'] = 'Table storing the type of teacher of the user.';
 $string['privacy:metadata:local_usercreation_type:userid'] = 'User ID';
 $string['privacy:metadata:local_usercreation_type:typeteacher'] = 'Teacher type of the user.';
