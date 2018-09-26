@@ -67,8 +67,8 @@ class createusers extends \core\task\scheduled_task {
 
             $DB->update_record('local_usercreation_twins', $twin);
         }
-		
-		$listufr = $DB->get_records('local_usercreation_ufr', array());
+
+        $listufr = $DB->get_records('local_usercreation_ufr', array());
 
         foreach ($listufr as $ufr) {
 
@@ -76,8 +76,8 @@ class createusers extends \core\task\scheduled_task {
 
             $DB->update_record('local_usercreation_ufr', $ufr);
         }
-		
-		$listvet = $DB->get_records('local_usercreation_vet', array());
+
+        $listvet = $DB->get_records('local_usercreation_vet', array());
 
         foreach ($listvet as $vet) {
 
@@ -138,29 +138,19 @@ class createusers extends \core\task\scheduled_task {
         global $DB;
 
         $user = $DB->get_record('user', array('username' => $studentuid));
+
         if ($user) {
-			
-			if ($studentuid == 'pclairzi') {
-				
-				echo "Etudiant : \n";
-				echo "UID : $studentuid\n";
-				echo "ID Number : $idnumber\n";
-				echo "User ID Number : $user->idnumber\n";
-				echo "Prénom : $firstname\n";
-				echo "Nom : $lastname\n";
-				echo "Mail : $email\n";
-			}
 
             if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
-				
-				if ($DB->record_exists('local_usercreation_twins', array('username' => $studentuid))) {
-					
-					$twin = $DB->get_record('local_usercreation_twins', array('username' => $studentuid));
-					$twin->fixed = 2;
-					$DB->update_record('local_usercreation_twins', $twin);
-				}
+
+                if ($DB->record_exists('local_usercreation_twins', array('username' => $studentuid))) {
+
+                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $studentuid));
+                    $twin->fixed = 2;
+                    $DB->update_record('local_usercreation_twins', $twin);
+                }
 
                 $this->updateuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
             } else {
@@ -170,19 +160,19 @@ class createusers extends \core\task\scheduled_task {
                 if ($DB->record_exists('local_usercreation_twins', array('username' => $studentuid))) {
 
                     $twin = $DB->get_record('local_usercreation_twins', array('username' => $studentuid));
-					
-					if ($twin->fixed == 1) {
-						
-						$twin->fixed = 2;
-						
-						$DB->update_record('local_usercreation_twins', $twin);
-						$this->updateuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
-						
-						// Pour chaque inscription de l'utilisateur sur l'année actuelle.
-						$this->yearenrolments($universityyear, $user);
-						
-						return null;
-					}
+
+                    if ($twin->fixed == 1) {
+
+                        $twin->fixed = 2;
+
+                        $DB->update_record('local_usercreation_twins', $twin);
+                        $this->updateuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
+
+                        // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+                        $this->yearenrolments($universityyear, $user);
+
+                        return null;
+                    }
                     $twin->fixed = 0;
 
                     $DB->update_record('local_usercreation_twins', $twin);
@@ -194,8 +184,8 @@ class createusers extends \core\task\scheduled_task {
 
                     $DB->insert_record('local_usercreation_twins', $twin);
                 }
-				
-				return null;
+
+                return null;
             }
         } else {
 
@@ -269,7 +259,7 @@ class createusers extends \core\task\scheduled_task {
 
             // Si cette inscription de l'utilisateur à cette composante
             // n'est pas encore dans mdl_local_ufrstudent, on l'y ajoute.
-			
+
             if (!$DB->record_exists('local_usercreation_ufr', array('userid' => $user->id, 'ufrcode' => $ufrcodeyear))) {
 
                 $ufrrecord = new \stdClass();
@@ -278,14 +268,16 @@ class createusers extends \core\task\scheduled_task {
                 $DB->insert_record('local_usercreation_ufr', $ufrrecord);
             } else {
 
-                $ufrrecord = $DB->get_record('local_usercreation_ufr', array('userid' => $user->id, 'ufrcode' => $ufrcodeyear));
-				$ufrrecord->stillexists = 1;
-				$DB->update_record('local_usercreation_ufr', $ufrrecord);
+                $ufrrecord = $DB->get_record('local_usercreation_ufr', array('userid' => $user->id,
+                    'ufrcode' => $ufrcodeyear));
+                $ufrrecord->stillexists = 1;
+                $DB->update_record('local_usercreation_ufr', $ufrrecord);
             }
 
             // Idem pour la VET.
 
-            if (!$DB->record_exists('local_usercreation_vet', array('studentid' => $user->id, 'vetcode' => $codeetapeyear))) {
+            if (!$DB->record_exists('local_usercreation_vet', array('studentid' => $user->id,
+                'vetcode' => $codeetapeyear))) {
 
                 $studentvetrecord = new \stdClass();
                 $studentvetrecord->studentid = $user->id;
@@ -294,9 +286,10 @@ class createusers extends \core\task\scheduled_task {
                 $DB->insert_record('local_usercreation_vet', $studentvetrecord);
             } else {
 
-                $vetrecord = $DB->get_record('local_usercreation_vet', array('studentid' => $user->id, 'vetcode' => $codeetapeyear));
-				$vetrecord->stillexists = 1;
-				$DB->update_record('local_usercreation_vet', $vetrecord);
+                $vetrecord = $DB->get_record('local_usercreation_vet', array('studentid' => $user->id,
+                    'vetcode' => $codeetapeyear));
+                $vetrecord->stillexists = 1;
+                $DB->update_record('local_usercreation_vet', $vetrecord);
             }
         }
     }
@@ -315,8 +308,8 @@ class createusers extends \core\task\scheduled_task {
     }
 
     private function teacherline($teacher) {
-		
-		global $DB;
+
+        global $DB;
 
         $teacheruid = $teacher->getAttribute('StaffUID');
 
@@ -327,37 +320,39 @@ class createusers extends \core\task\scheduled_task {
             if ($teacher->hasAttribute('StaffETU')) {
 
                 $idnumber = $teacher->getAttribute('StaffETU');
-				
-				// A supprimer une fois que le fichier personnel sera complété.
-				
-				if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $idnumber))) {
-					
-					$phdstudentrecord = new \stdClass();
-					$phdstudentrecord->username = $teacher->getAttribute('StaffUID');
-					$phdstudentrecord->studentcode = $teacher->getAttribute('StaffETU');
-					$phdstudentrecord->staffcode = $teacher->getAttribute('StaffCode');
-					
-					$DB->insert_record('local_usercreation_phdstu', $phdstudentrecord);
-				} else {
-					
-					$phdstudentrecord = $DB->get_record('local_usercreation_phdstu', array('studentcode' => $idnumber));
-					$phdstudentrecord->username = $teacher->getAttribute('StaffUID');
-					$phdstudentrecord->studentcode = $teacher->getAttribute('StaffETU');
-					$phdstudentrecord->staffcode = $teacher->getAttribute('StaffCode');
-					
-					$DB->update_record('local_usercreation_phdstu', $phdstudentrecord);
-				}
-				
-				// Fin de la partie à supprimer.
+
+                // A supprimer une fois que le fichier personnel sera complété.
+
+                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $idnumber))) {
+
+                    $phdstudentrecord = new \stdClass();
+                    $phdstudentrecord->username = $teacher->getAttribute('StaffUID');
+                    $phdstudentrecord->studentcode = $teacher->getAttribute('StaffETU');
+                    $phdstudentrecord->staffcode = $teacher->getAttribute('StaffCode');
+
+                    $DB->insert_record('local_usercreation_phdstu', $phdstudentrecord);
+                } else {
+
+                    $phdstudentrecord = $DB->get_record('local_usercreation_phdstu',
+                            array('studentcode' => $idnumber));
+                    $phdstudentrecord->username = $teacher->getAttribute('StaffUID');
+                    $phdstudentrecord->studentcode = $teacher->getAttribute('StaffETU');
+                    $phdstudentrecord->staffcode = $teacher->getAttribute('StaffCode');
+
+                    $DB->update_record('local_usercreation_phdstu', $phdstudentrecord);
+                }
+
+                // Fin de la partie à supprimer.
             } else {
-				
-				if ($DB->record_exists('local_usercreation_phdstu', array('username' => $teacheruid))) {
-					
-					$DB->delete_records('local_usercreation_phdstu', array('username' => $teacheruid));
-				}
+
+                if ($DB->record_exists('local_usercreation_phdstu', array('username' => $teacheruid))) {
+
+                    $DB->delete_records('local_usercreation_phdstu', array('username' => $teacheruid));
+                }
 
                 $idnumber = $teacher->getAttribute('StaffCode');
             }
+
             $lastname = ucwords(strtolower($teacher->getAttribute('StaffCommonName')));
             $firstname = ucwords(strtolower($teacher->getAttribute('StaffFirstName')));
             $affectations = $teacher->childNodes;
@@ -387,19 +382,19 @@ class createusers extends \core\task\scheduled_task {
         global $DB;
 
         if ($DB->record_exists('user', array('username' => $teacheruid))) {
-			
-			$user = $DB->get_record('user', array('username' => $teacheruid));
+
+            $user = $DB->get_record('user', array('username' => $teacheruid));
 
             if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
-				
-				if ($DB->record_exists('local_usercreation_twins', array('username' => $teacheruid))) {
-					
-					$twin = $DB->get_record('local_usercreation_twins', array('username' => $teacheruid));
-					$twin->fixed = 2;
-					$DB->update_record('local_usercreation_twins', $twin);
-				}
+
+                if ($DB->record_exists('local_usercreation_twins', array('username' => $teacheruid))) {
+
+                        $twin = $DB->get_record('local_usercreation_twins', array('username' => $teacheruid));
+                        $twin->fixed = 2;
+                        $DB->update_record('local_usercreation_twins', $twin);
+                }
 
                 $this->updateuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
             } else {
@@ -409,20 +404,20 @@ class createusers extends \core\task\scheduled_task {
                 if ($DB->record_exists('local_usercreation_twins', array('username' => $teacheruid))) {
 
                     $twin = $DB->get_record('local_usercreation_twins', array('username' => $teacheruid));
-					
-					if ($twin->fixed == 1) {
-						
-						$twin->fixed = 2;
-						
-						$DB->update_record('local_usercreation_twins', $twin);
-						$this->updateuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
-						
-						// Pour chaque inscription de l'utilisateur sur l'année actuelle.
-						$this->teachersync($affectation, $teacher);
-						
-						return null;
-					}
-					
+
+                    if ($twin->fixed == 1) {
+
+                        $twin->fixed = 2;
+
+                        $DB->update_record('local_usercreation_twins', $twin);
+                        $this->updateuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
+
+                        // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+                        $this->teachersync($affectation, $teacher);
+
+                        return null;
+                    }
+
                     $twin->fixed = 0;
 
                     $DB->update_record('local_usercreation_twins', $twin);
@@ -434,8 +429,8 @@ class createusers extends \core\task\scheduled_task {
 
                     $DB->insert_record('local_usercreation_twins', $twin);
                 }
-				
-				return null;
+
+                return null;
             }
         } else {
 
@@ -452,8 +447,7 @@ class createusers extends \core\task\scheduled_task {
 
         // Ici, gérer local_usercreation_ufr et local_usercreation_type.
 
-        $teacherdata = $DB->get_record('user',
-                array('username' => $teacher->getAttribute('StaffUID')));
+        $teacherdata = $DB->get_record('user', array('username' => $teacher->getAttribute('StaffUID')));
 
         $codestructure = $affectation->getAttribute('CodeStructure');
 
@@ -468,7 +462,7 @@ class createusers extends \core\task\scheduled_task {
                 $ufrteacher['ufrcode'] = $ufrcode;
                 $DB->insert_record('local_usercreation_ufr', $ufrteacher);
                 if ($DB->record_exists('local_usercreation_ufr',
-                    array('userid' => $teacherdata->id, 'ufrcode' => '-1'))) {
+                        array('userid' => $teacherdata->id, 'ufrcode' => '-1'))) {
 
                     $DB->delete_record('local_usercreation_ufr',
                             array('userid' => $teacherdata->id, 'ufrcode' => '-1'));
@@ -491,7 +485,7 @@ class createusers extends \core\task\scheduled_task {
                     . "userid = ? AND typeteacher LIKE ?";
 
             if (!$DB->record_exists_sql($sqlrecordexistsinfodata,
-                        array($teacherdata->id, $teacher->getAttribute('LC_CORPS')))) {
+                    array($teacherdata->id, $teacher->getAttribute('LC_CORPS')))) {
 
                 $typeprofdata = array();
                 $typeprofdata['userid'] = $teacherdata->id;
@@ -530,8 +524,8 @@ class createusers extends \core\task\scheduled_task {
     }
 
     private function staffline ($staff) {
-		
-		global $DB;
+
+        global $DB;
 
         $staffuid = $staff->getAttribute('UID');
 
@@ -546,16 +540,16 @@ class createusers extends \core\task\scheduled_task {
 
                 $idnumber = $staff->getAttribute('NO_INDIVIDU');
             }
-			
-			// A supprimer une fois que le fichier personnel sera complété.
-			
-			if ($DB->record_exists('local_usercreation_phdstu', array('staffcode' => $idnumber, 'username' => $staffuid))) {
-				
-				$idnumber = $DB->get_record('local_usercreation_phdstu', array('staffcode' => $idnumber, 'username' => $staffuid))->studentcode;
-			}
-			
-			// Fin de la partie à supprimer.
-			
+
+            // A supprimer une fois que le fichier personnel sera complété.
+
+            if ($DB->record_exists('local_usercreation_phdstu', array('staffcode' => $idnumber, 'username' => $staffuid))) {
+
+                    $idnumber = $DB->get_record('local_usercreation_phdstu', array('staffcode' => $idnumber, 'username' => $staffuid))->studentcode;
+            }
+
+            // Fin de la partie à supprimer.
+
             $lastname = ucwords(strtolower($staff->getAttribute('NOM_USUEL')));
             $firstname = ucwords(strtolower($staff->getAttribute('PRENOM')));
 
@@ -568,19 +562,19 @@ class createusers extends \core\task\scheduled_task {
         global $DB;
 
         if ($DB->record_exists('user', array('username' => $staffuid))) {
-			
-			$user = $DB->get_record('user', array('username' => $staffuid));
+
+            $user = $DB->get_record('user', array('username' => $staffuid));
 
             if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
-				
-				if ($DB->record_exists('local_usercreation_twins', array('username' => $staffuid))) {
-				
-					$twin = $DB->get_record('local_usercreation_twins', array('username' => $staffuid));
-					$twin->fixed = 2;
-					$DB->update_record('local_usercreation_twins', $twin);
-				}
+
+                if ($DB->record_exists('local_usercreation_twins', array('username' => $staffuid))) {
+
+                        $twin = $DB->get_record('local_usercreation_twins', array('username' => $staffuid));
+                        $twin->fixed = 2;
+                        $DB->update_record('local_usercreation_twins', $twin);
+                }
 
                 $this->updateuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
             } else {
@@ -588,19 +582,19 @@ class createusers extends \core\task\scheduled_task {
                 // Doublon.
 
                 if ($DB->record_exists('local_usercreation_twins', array('username' => $staffuid))) {
-					
+
                     $twin = $DB->get_record('local_usercreation_twins', array('username' => $staffuid));
-					
-					if ($twin->fixed == 1) {
-						
-						$twin->fixed = 2;
-						
-						$DB->update_record('local_usercreation_twins', $twin);
-						$this->updateuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
-						
-						return null;
-					}
-					
+
+                    if ($twin->fixed == 1) {
+
+                            $twin->fixed = 2;
+
+                            $DB->update_record('local_usercreation_twins', $twin);
+                            $this->updateuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
+
+                            return null;
+                    }
+
                     $twin->fixed = 0;
 
                     $DB->update_record('local_usercreation_twins', $twin);
@@ -612,8 +606,8 @@ class createusers extends \core\task\scheduled_task {
 
                     $DB->insert_record('local_usercreation_twins', $twin);
                 }
-				
-				return null;
+
+                return null;
             }
         } else {
 
@@ -626,8 +620,8 @@ class createusers extends \core\task\scheduled_task {
         global $DB;
 
         $DB->delete_records('local_usercreation_twins', array('fixed' => 1));
-		$DB->delete_records('local_usercreation_twins', array('fixed' => 2));
-		$DB->delete_records('local_usercreation_ufr', array('stillexists' => 0));
-		$DB->delete_records('local_usercreation_vet', array('stillexists' => 0));
+        $DB->delete_records('local_usercreation_twins', array('fixed' => 2));
+        $DB->delete_records('local_usercreation_ufr', array('stillexists' => 0));
+        $DB->delete_records('local_usercreation_vet', array('stillexists' => 0));
     }
 }
