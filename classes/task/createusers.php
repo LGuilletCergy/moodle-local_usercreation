@@ -320,29 +320,6 @@ class createusers extends \core\task\scheduled_task {
             if ($teacher->hasAttribute('StaffETU')) {
 
                 $idnumber = $teacher->getAttribute('StaffETU');
-
-                // A supprimer une fois que le fichier personnel sera complété.
-
-                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $idnumber))) {
-
-                    $phdstudentrecord = new \stdClass();
-                    $phdstudentrecord->username = $teacher->getAttribute('StaffUID');
-                    $phdstudentrecord->studentcode = $teacher->getAttribute('StaffETU');
-                    $phdstudentrecord->staffcode = $teacher->getAttribute('StaffCode');
-
-                    $DB->insert_record('local_usercreation_phdstu', $phdstudentrecord);
-                } else {
-
-                    $phdstudentrecord = $DB->get_record('local_usercreation_phdstu',
-                            array('studentcode' => $idnumber));
-                    $phdstudentrecord->username = $teacher->getAttribute('StaffUID');
-                    $phdstudentrecord->studentcode = $teacher->getAttribute('StaffETU');
-                    $phdstudentrecord->staffcode = $teacher->getAttribute('StaffCode');
-
-                    $DB->update_record('local_usercreation_phdstu', $phdstudentrecord);
-                }
-
-                // Fin de la partie à supprimer.
             } else {
 
                 if ($DB->record_exists('local_usercreation_phdstu', array('username' => $teacheruid))) {
@@ -533,22 +510,13 @@ class createusers extends \core\task\scheduled_task {
 
             $email = $staff->getAttribute('MAIL');
 
-            if ($staff->hasAttribute('StaffETU')) {
+            if ($staff->hasAttribute('CODE_ETUDIANT')) {
 
-                $idnumber = $staff->getAttribute('StaffETU');
+                $idnumber = $staff->getAttribute('CODE_ETUDIANT');
             } else {
 
                 $idnumber = $staff->getAttribute('NO_INDIVIDU');
             }
-
-            // A supprimer une fois que le fichier personnel sera complété.
-
-            if ($DB->record_exists('local_usercreation_phdstu', array('staffcode' => $idnumber, 'username' => $staffuid))) {
-
-                    $idnumber = $DB->get_record('local_usercreation_phdstu', array('staffcode' => $idnumber, 'username' => $staffuid))->studentcode;
-            }
-
-            // Fin de la partie à supprimer.
 
             $lastname = ucwords(strtolower($staff->getAttribute('NOM_USUEL')));
             $firstname = ucwords(strtolower($staff->getAttribute('PRENOM')));
