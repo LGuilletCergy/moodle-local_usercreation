@@ -34,7 +34,7 @@
 $string['createusers'] = "Création de tout les comptes";
 $string['pluginname'] = "Création des utilisateurs";
 $string['year'] = "Année à utiliser pour la création des comptes étudiants";
-$string['youretwin'] = '<br>UUn autre utilisateur a le même identifiant que vous.'
+$string['youretwin'] = '<br>Un autre utilisateur a le même identifiant que vous.'
         . ' En conséquence, nous ne sommes pas en mesure de vous distinguer.<br>'
         . 'Un message vient d\'être envoyé aux services compétents pour signaler ce problème.'
         . ' Vous (ou l\'autre utilisateur) recevrez bientôt un nouvel identifiant.';
