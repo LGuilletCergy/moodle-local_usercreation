@@ -34,5 +34,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_usercreation';
-$plugin->version = 2018100900;
+$plugin->version = 2018100901;
 $plugin->requires = 2017111300;
