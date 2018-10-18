@@ -92,6 +92,8 @@ class createusers extends \core\task\scheduled_task {
 
     private function givestudentnumber() {
 
+        global $DB;
+
         // D'abord les enseignants.
 
         $xmldocteacher = new \DOMDocument();
