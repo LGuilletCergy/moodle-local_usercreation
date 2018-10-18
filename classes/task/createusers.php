@@ -49,6 +49,7 @@ class createusers extends \core\task\scheduled_task {
     public function execute() {
 
         $this->preprocess();
+        $this->givestudentnumber();
         $this->createstudents();
         $this->createteachers();
         $this->createstaff();
@@ -84,6 +85,105 @@ class createusers extends \core\task\scheduled_task {
             $vet->stillexists = 0;
 
             $DB->update_record('local_usercreation_vet', $vet);
+        }
+    }
+
+    // Si un enseignant ou personnel a un numéro étudiant, on le lui attribue comme numéro d'identification.
+
+    private function givestudentnumber() {
+
+        // D'abord les enseignants.
+
+        $xmldocteacher = new \DOMDocument();
+        $xmldocteacher->load('/home/referentiel/DOKEOS_Enseignants_Affectations.xml');
+        $xpathvarteacher = new \Domxpath($xmldocteacher);
+        $listteachers = $xpathvarteacher->query('//Teacher');
+
+        foreach ($listteachers as $teacher) {
+
+            $username = $teacher->getAttribute('StaffUID');
+            $staffnumber = $teacher->getAttribute('StaffCode');
+
+            if ($teacher->hasAttribute('StaffETU')) {
+
+                $etunumber = $teacher->getAttribute('StaffETU');
+
+                if ($DB->record_exist('user', array('username' => $username, 'idnumber' => $staffnumber))) {
+
+                    $record = $DB->get_record('user', array('username' => $username, 'idnumber' => $staffnumber));
+                    $record->idnumber = $etunumber;
+                    $DB->update_record('user', $record);
+                }
+
+                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $etunumber))) {
+
+                    $phdstudentrecord = new \stdClass();
+                    $phdstudentrecord->username = $username;
+                    $phdstudentrecord->studentcode = $etunumber;
+                    $phdstudentrecord->staffcode = $staffnumber;
+
+                    $DB->insert_record('local_usercreation_phdstu', $phdstudentrecord);
+                } else {
+
+                    $phdstudentrecord = $DB->get_record('local_usercreation_phdstu', array('studentcode' => $etunumber));
+                    $phdstudentrecord->username = $username;
+                    $phdstudentrecord->studentcode = $etunumber;
+                    $phdstudentrecord->staffcode = $staffnumber;
+
+                    $DB->update_record('local_usercreation_phdstu', $phdstudentrecord);
+                }
+            } else {
+
+                $DB->delete_records('local_usercreation_phdstu',
+                        array('username' => $username, 'staffcode' => $staffnumber));
+            }
+        }
+
+        // Ensuite les personnels.
+
+        $xmldocstaff = new \DOMDocument();
+        $xmldocstaff->load('/home/referentiel/sefiap_personnel_composante.xml');
+        $xpathvarstaff = new \Domxpath($xmldocstaff);
+        $liststaff = $xpathvarstaff->query('//Composante/Service/Individu');
+
+        foreach ($liststaff as $staff) {
+
+            $username = $staff->getAttribute('UID');
+            $staffnumber = $staff->getAttribute('NO_INDIVIDU');
+
+            if ($staff->hasAttribute('CODE_ETUDIANT')) {
+
+                $etunumber = $staff->getAttribute('CODE_ETUDIANT');
+
+                if ($DB->record_exist('user', array('username' => $username, 'idnumber' => $staffnumber))) {
+
+                    $record = $DB->get_record('user', array('username' => $username, 'idnumber' => $staffnumber));
+                    $record->idnumber = $etunumber;
+                    $DB->update_record('user', $record);
+                }
+
+                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $etunumber))) {
+
+                    $phdstudentrecord = new \stdClass();
+                    $phdstudentrecord->username = $username;
+                    $phdstudentrecord->studentcode = $etunumber;
+                    $phdstudentrecord->staffcode = $staffnumber;
+
+                    $DB->insert_record('local_usercreation_phdstu', $phdstudentrecord);
+                } else {
+
+                    $phdstudentrecord = $DB->get_record('local_usercreation_phdstu', array('studentcode' => $etunumber));
+                    $phdstudentrecord->username = $username;
+                    $phdstudentrecord->studentcode = $etunumber;
+                    $phdstudentrecord->staffcode = $staffnumber;
+
+                    $DB->update_record('local_usercreation_phdstu', $phdstudentrecord);
+                }
+            } else {
+
+                $DB->delete_records('local_usercreation_phdstu',
+                        array('username' => $username, 'staffcode' => $staffnumber));
+            }
         }
     }
 
@@ -320,37 +420,17 @@ class createusers extends \core\task\scheduled_task {
             if ($teacher->hasAttribute('StaffETU')) {
 
                 $idnumber = $teacher->getAttribute('StaffETU');
-
-                // A supprimer une fois que le fichier personnel sera complété.
-
-                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $idnumber))) {
-
-                    $phdstudentrecord = new \stdClass();
-                    $phdstudentrecord->username = $teacher->getAttribute('StaffUID');
-                    $phdstudentrecord->studentcode = $teacher->getAttribute('StaffETU');
-                    $phdstudentrecord->staffcode = $teacher->getAttribute('StaffCode');
-
-                    $DB->insert_record('local_usercreation_phdstu', $phdstudentrecord);
-                } else {
-
-                    $phdstudentrecord = $DB->get_record('local_usercreation_phdstu',
-                            array('studentcode' => $idnumber));
-                    $phdstudentrecord->username = $teacher->getAttribute('StaffUID');
-                    $phdstudentrecord->studentcode = $teacher->getAttribute('StaffETU');
-                    $phdstudentrecord->staffcode = $teacher->getAttribute('StaffCode');
-
-                    $DB->update_record('local_usercreation_phdstu', $phdstudentrecord);
-                }
-
-                // Fin de la partie à supprimer.
             } else {
 
-                if ($DB->record_exists('local_usercreation_phdstu', array('username' => $teacheruid))) {
-
-                    $DB->delete_records('local_usercreation_phdstu', array('username' => $teacheruid));
-                }
-
                 $idnumber = $teacher->getAttribute('StaffCode');
+            }
+
+            if ($DB->record_exists('local_usercreation_phdstu',
+                    array('staffcode' => $teacher->getAttribute('StaffCode'), 'username' => $teacheruid))) {
+
+                    $idnumber = $DB->get_record('local_usercreation_phdstu',
+                            array('staffcode' => $teacher->getAttribute('StaffCode'),
+                                'username' => $teacheruid))->studentcode;
             }
 
             $lastname = ucwords(strtolower($teacher->getAttribute('StaffCommonName')));
@@ -543,9 +623,12 @@ class createusers extends \core\task\scheduled_task {
 
             // A supprimer une fois que le fichier personnel sera complété.
 
-            if ($DB->record_exists('local_usercreation_phdstu', array('staffcode' => $idnumber, 'username' => $staffuid))) {
+            if ($DB->record_exists('local_usercreation_phdstu',
+                    array('staffcode' => $staff->getAttribute('NO_INDIVIDU'), 'username' => $staffuid))) {
 
-                    $idnumber = $DB->get_record('local_usercreation_phdstu', array('staffcode' => $idnumber, 'username' => $staffuid))->studentcode;
+                    $idnumber = $DB->get_record('local_usercreation_phdstu',
+                            array('staffcode' => $staff->getAttribute('NO_INDIVIDU'),
+                                'username' => $staffuid))->studentcode;
             }
 
             // Fin de la partie à supprimer.
