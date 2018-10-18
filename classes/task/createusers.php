@@ -108,7 +108,7 @@ class createusers extends \core\task\scheduled_task {
 
                 $etunumber = $teacher->getAttribute('StaffETU');
 
-                if ($DB->record_exist('user', array('username' => $username, 'idnumber' => $staffnumber))) {
+                if ($DB->record_exists('user', array('username' => $username, 'idnumber' => $staffnumber))) {
 
                     $record = $DB->get_record('user', array('username' => $username, 'idnumber' => $staffnumber));
                     $record->idnumber = $etunumber;
@@ -155,7 +155,7 @@ class createusers extends \core\task\scheduled_task {
 
                 $etunumber = $staff->getAttribute('CODE_ETUDIANT');
 
-                if ($DB->record_exist('user', array('username' => $username, 'idnumber' => $staffnumber))) {
+                if ($DB->record_exists('user', array('username' => $username, 'idnumber' => $staffnumber))) {
 
                     $record = $DB->get_record('user', array('username' => $username, 'idnumber' => $staffnumber));
                     $record->idnumber = $etunumber;
