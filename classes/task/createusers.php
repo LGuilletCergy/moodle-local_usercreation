@@ -117,7 +117,8 @@ class createusers extends \core\task\scheduled_task {
                     $DB->update_record('user', $record);
                 }
 
-                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $etunumber))) {
+                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $etunumber))
+                        && $username != "") {
 
                     $phdstudentrecord = new \stdClass();
                     $phdstudentrecord->username = $username;
@@ -125,7 +126,7 @@ class createusers extends \core\task\scheduled_task {
                     $phdstudentrecord->staffcode = $staffnumber;
 
                     $DB->insert_record('local_usercreation_phdstu', $phdstudentrecord);
-                } else {
+                } else if ($username != "") {
 
                     $phdstudentrecord = $DB->get_record('local_usercreation_phdstu', array('studentcode' => $etunumber));
                     $phdstudentrecord->username = $username;
@@ -164,7 +165,8 @@ class createusers extends \core\task\scheduled_task {
                     $DB->update_record('user', $record);
                 }
 
-                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $etunumber))) {
+                if (!$DB->record_exists('local_usercreation_phdstu', array('studentcode' => $etunumber))
+                        && $username != "") {
 
                     $phdstudentrecord = new \stdClass();
                     $phdstudentrecord->username = $username;
@@ -172,7 +174,7 @@ class createusers extends \core\task\scheduled_task {
                     $phdstudentrecord->staffcode = $staffnumber;
 
                     $DB->insert_record('local_usercreation_phdstu', $phdstudentrecord);
-                } else {
+                } else if ($username != "") {
 
                     $phdstudentrecord = $DB->get_record('local_usercreation_phdstu', array('studentcode' => $etunumber));
                     $phdstudentrecord->username = $username;
