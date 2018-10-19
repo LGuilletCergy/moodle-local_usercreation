@@ -214,8 +214,8 @@ class createusers extends \core\task\scheduled_task {
 
             $email = $student->getAttribute('StudentEmail');
             $idnumber = $student->getAttribute('StudentETU');
-            $lastname = nameprocessor(strtolower($student->getAttribute('StudentName')));
-            $firstname = nameprocessor(strtolower($student->getAttribute('StudentFirstName')));
+            $lastname = $this->nameprocessor(strtolower($student->getAttribute('StudentName')));
+            $firstname = $this->nameprocessor(strtolower($student->getAttribute('StudentFirstName')));
             $universityyears = $student->childNodes;
 
             foreach ($universityyears as $universityyear) {
@@ -438,8 +438,8 @@ class createusers extends \core\task\scheduled_task {
                             'username' => $teacheruid))->studentcode;
             }
 
-            $lastname = nameprocessor(strtolower($teacher->getAttribute('StaffCommonName')));
-            $firstname = nameprocessor(strtolower($teacher->getAttribute('StaffFirstName')));
+            $lastname = $this->nameprocessor(strtolower($teacher->getAttribute('StaffCommonName')));
+            $firstname = $this->nameprocessor(strtolower($teacher->getAttribute('StaffFirstName')));
             $affectations = $teacher->childNodes;
 
             foreach ($affectations as $affectation) {
@@ -634,8 +634,8 @@ class createusers extends \core\task\scheduled_task {
                                 'username' => $staffuid))->studentcode;
             }
 
-            $lastname = nameprocessor(strtolower($staff->getAttribute('NOM_USUEL')));
-            $firstname = nameprocessor(strtolower($staff->getAttribute('PRENOM')));
+            $lastname = $this->nameprocessor(strtolower($staff->getAttribute('NOM_USUEL')));
+            $firstname = $this->nameprocessor(strtolower($staff->getAttribute('PRENOM')));
 
             $this->processstaff($staffuid, $idnumber, $firstname, $lastname, $email);
         }
