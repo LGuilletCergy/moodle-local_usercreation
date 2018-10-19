@@ -214,8 +214,8 @@ class createusers extends \core\task\scheduled_task {
 
             $email = $student->getAttribute('StudentEmail');
             $idnumber = $student->getAttribute('StudentETU');
-            $lastname = ucwords(strtolower($student->getAttribute('StudentName')));
-            $firstname = ucwords(strtolower($student->getAttribute('StudentFirstName')));
+            $lastname = nameprocessor(strtolower($student->getAttribute('StudentName')));
+            $firstname = nameprocessor(strtolower($student->getAttribute('StudentFirstName')));
             $universityyears = $student->childNodes;
 
             foreach ($universityyears as $universityyear) {
@@ -438,8 +438,8 @@ class createusers extends \core\task\scheduled_task {
                             'username' => $teacheruid))->studentcode;
             }
 
-            $lastname = ucwords(strtolower($teacher->getAttribute('StaffCommonName')));
-            $firstname = ucwords(strtolower($teacher->getAttribute('StaffFirstName')));
+            $lastname = nameprocessor(strtolower($teacher->getAttribute('StaffCommonName')));
+            $firstname = nameprocessor(strtolower($teacher->getAttribute('StaffFirstName')));
             $affectations = $teacher->childNodes;
 
             foreach ($affectations as $affectation) {
@@ -626,8 +626,6 @@ class createusers extends \core\task\scheduled_task {
                 $idnumber = $staff->getAttribute('NO_INDIVIDU');
             }
 
-            // A supprimer une fois que le fichier personnel sera complété.
-
             if ($DB->record_exists('local_usercreation_phdstu',
                     array('staffcode' => $staff->getAttribute('NO_INDIVIDU'), 'username' => $staffuid))) {
 
@@ -636,10 +634,8 @@ class createusers extends \core\task\scheduled_task {
                                 'username' => $staffuid))->studentcode;
             }
 
-            // Fin de la partie à supprimer.
-
-            $lastname = ucwords(strtolower($staff->getAttribute('NOM_USUEL')));
-            $firstname = ucwords(strtolower($staff->getAttribute('PRENOM')));
+            $lastname = nameprocessor(strtolower($staff->getAttribute('NOM_USUEL')));
+            $firstname = nameprocessor(strtolower($staff->getAttribute('PRENOM')));
 
             $this->processstaff($staffuid, $idnumber, $firstname, $lastname, $email);
         }
@@ -711,5 +707,23 @@ class createusers extends \core\task\scheduled_task {
         $DB->delete_records('local_usercreation_twins', array('fixed' => 2));
         $DB->delete_records('local_usercreation_ufr', array('stillexists' => 0));
         $DB->delete_records('local_usercreation_vet', array('stillexists' => 0));
+    }
+
+    private function nameprocessor($name) {
+
+        $lowername = strtolower($name);
+        $tabname = explode('-', $lowername);
+        $processedname = "";
+
+        foreach($tabname as $tabelement) {
+
+
+
+            $processedname .= ucfirst($tabelement)."-";
+        }
+
+        $finalname = substr($processedname, 0, -1);
+
+        return $finalname;
     }
 }
