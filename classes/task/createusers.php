@@ -209,7 +209,7 @@ class createusers extends \core\task\scheduled_task {
         $studentuid = $student->getAttribute('StudentUID');
         echo 'studentuid = '.$studentuid."\n";
 
-        if ($studentuid) {
+        if ($student->hasAttribute('StudentUID')) {
 
             $email = $student->getAttribute('StudentEmail');
             $idnumber = $student->getAttribute('StudentETU');
@@ -417,7 +417,7 @@ class createusers extends \core\task\scheduled_task {
 
         $teacheruid = $teacher->getAttribute('StaffUID');
 
-        if ($teacheruid) {
+        if ($teacher->hasAttribute('StaffUID')) {
 
             $email = $teacher->getAttribute('StaffEmail');
 
@@ -613,7 +613,7 @@ class createusers extends \core\task\scheduled_task {
 
         $staffuid = $staff->getAttribute('UID');
 
-        if ($staffuid) {
+        if ($staff->hasAttribute('UID')) {
 
             $email = $staff->getAttribute('MAIL');
 
