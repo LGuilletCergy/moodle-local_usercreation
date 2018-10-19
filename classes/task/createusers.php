@@ -207,9 +207,10 @@ class createusers extends \core\task\scheduled_task {
     private function studentline($student) {
 
         $studentuid = $student->getAttribute('StudentUID');
-        echo 'studentuid = '.$studentuid."\n";
 
         if ($student->hasAttribute('StudentUID')) {
+
+            echo 'studentuid = '.$studentuid."\n";
 
             $email = $student->getAttribute('StudentEmail');
             $idnumber = $student->getAttribute('StudentETU');
@@ -432,9 +433,9 @@ class createusers extends \core\task\scheduled_task {
             if ($DB->record_exists('local_usercreation_phdstu',
                     array('staffcode' => $teacher->getAttribute('StaffCode'), 'username' => $teacheruid))) {
 
-                    $idnumber = $DB->get_record('local_usercreation_phdstu',
-                            array('staffcode' => $teacher->getAttribute('StaffCode'),
-                                'username' => $teacheruid))->studentcode;
+                $idnumber = $DB->get_record('local_usercreation_phdstu',
+                        array('staffcode' => $teacher->getAttribute('StaffCode'),
+                            'username' => $teacheruid))->studentcode;
             }
 
             $lastname = ucwords(strtolower($teacher->getAttribute('StaffCommonName')));
@@ -475,9 +476,9 @@ class createusers extends \core\task\scheduled_task {
 
                 if ($DB->record_exists('local_usercreation_twins', array('username' => $teacheruid))) {
 
-                        $twin = $DB->get_record('local_usercreation_twins', array('username' => $teacheruid));
-                        $twin->fixed = 2;
-                        $DB->update_record('local_usercreation_twins', $twin);
+                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $teacheruid));
+                    $twin->fixed = 2;
+                    $DB->update_record('local_usercreation_twins', $twin);
                 }
 
                 $this->updateuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
