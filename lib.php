@@ -62,96 +62,96 @@ function local_usercreation_extend_navigation(global_navigation $nav) {
         $hastwin = $DB->record_exists('local_usercreation_twins', array('username' => $USER->username));
 
         if ($hastwin) {
-			
+
 			$twin = $DB->get_record('local_usercreation_twins', array('username' => $USER->username));
-			
+
 			// Si ça fait plus de 24 heures que le dernier mail a été envoyé.
-			
+
 			if ($twin->checkedon < (time() - 24 * 3600) || !isset($twin->checkedon)) {
-			
+
 				$twin->checkedon = time();
-				
+
 				$DB->update_record('local_usercreation_twins', $twin);
-				
+
 				$mailcontent = "Bonjour,\nLes personnes suivantes ont le même login :\n";
 				$nbtwin = 1;
-				
+
 				$studentxml = new DOMDocument();
 				$studentxml->load('/home/referentiel/DOKEOS_Etudiants_Inscriptions.xml');
-				
+
 				// En théorie, il serait mieux de chercher uniquement les Students avec le bon StudentUID dans le XML puis de les parcourir mais ...
 				// CA MARCHE PAS ! Et je ne sais pas pourquoi...
-				
+
 				$studentxpathvar = new Domxpath($studentxml);
 				$liststudents = $studentxpathvar->query("//Student");
-				
+
 				foreach ($liststudents as $student) {
-					
+
 					if ($student->getAttribute('StudentUID') == $USER->username) {
-					
+
 						// Récupérer les infos et envoyer le mail.
-						
+
 						$username = $student->getAttribute('StudentUID');
 						$firstname = ucwords(strtolower($student->getAttribute('StudentFirstName')));
 						$commonname = ucwords(strtolower($student->getAttribute('StudentName')));
 						$idnumber = $student->getAttribute('StudentETU');
 						$mail = $student->getAttribute('StudentEmail');
-						
+
 						$mailcontent .= "\nPersonne $nbtwin : ".formatdata($username, $firstname, $commonname, $idnumber, $mail, 'Etudiant')."\n\n";
 						$nbtwin++;
 					}
 				}
-				
+
 				$teacherxml = new DOMDocument();
 				$teacherxml->load('/home/referentiel/DOKEOS_Enseignants_Affectations.xml');
 				$teacherxpathvar = new Domxpath($teacherxml);
 				$listteachers = $teacherxpathvar->query("//Teacher");
-				
+
 				foreach ($listteachers as $teacher) {
-					
+
 					if ($teacher->getAttribute('StaffUID') == $USER->username) {
-					
+
 						// Récupérer les infos et envoyer le mail.
-						
+
 						$username = $teacher->getAttribute('StaffUID');
 						$firstname = ucwords(strtolower($teacher->getAttribute('StaffFirstName')));
 						$commonname = ucwords(strtolower($teacher->getAttribute('StaffCommonName')));
 						$idnumber = $teacher->getAttribute('StaffCode');
 						$mail = $teacher->getAttribute('StaffEmail');
-						
+
 						$mailcontent .= "\nPersonne $nbtwin : ".formatdata($username, $firstname, $commonname, $idnumber, $mail, 'Enseignant')."\n\n";
 						$nbtwin++;
 					}
 				}
-				
+
 				$staffxml = new DOMDocument();
 				$staffxml->load('/home/referentiel/sefiap_personnel_composante.xml');
 				$staffxpathvar = new Domxpath($staffxml);
 				$liststaffs = $staffxpathvar->query("//Composante/Service/Individu");
-				
+
 				foreach ($liststaffs as $staff) {
-					
+
 					if ($staff->getAttribute('UID') == $USER->username) {
-					
+
 						// Récupérer les infos et envoyer le mail.
-						
+
 						$username = $staff->getAttribute('UID');
 						$firstname = ucwords(strtolower($staff->getAttribute('PRENOM')));
 						$commonname = ucwords(strtolower($staff->getAttribute('NOM_USUEL')));
 						$idnumber = $staff->getAttribute('NO_INDIVIDU');
 						$mail = $staff->getAttribute('MAIL');
-						
+
 						$mailcontent .= "\nPersonne $nbtwin : ".formatdata($username, $firstname, $commonname, $idnumber, $mail, 'Personnel')."\n";
 						$nbtwin++;
 					}
 				}
-				
+
 				$mailcontent .= "\nL'une de ces personnes a tenté de se connecter sur la plateforme CoursUCP et n'a pas pu à la date : "
 					.date("d/m/Y à G:i")."\n\nCoursUCP, Service d'ingénierie pédagogique";
-				
-				$mailrecipients = 'laurent.guillet@u-cergy.fr, noa.randriamalaka@u-cergy.fr, brice.errandonea@u-cergy.fr,'.
+
+				$mailrecipients = 's.ingenierie.logicielle@ml.u-cergy.fr, '.
 					'samira.kheloufi@u-cergy.fr, guillaume.renier@u-cergy.fr, daniel.fouquet@u-cergy.fr, jean-thierry.graveaud@u-cergy.fr';
-				
+
 				mail($mailrecipients, 'Doublon de logins détecté par CoursUCP', $mailcontent);
 			}
 
@@ -163,9 +163,9 @@ function local_usercreation_extend_navigation(global_navigation $nav) {
 }
 
 function formatdata ($username, $firstname, $commonname, $idnumber, $mail, $type) {
-	
+
 	$partialmail = "Nom d'utilisateur : $username\nPrénom: $firstname\nNom : $commonname\n".
 		"Numéro d'identification : $idnumber\nAdresse mail : $mail\nType : $type";
-	
+
 	return $partialmail;
 }
