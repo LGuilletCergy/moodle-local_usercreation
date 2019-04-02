@@ -48,11 +48,13 @@ class createusers extends \core\task\scheduled_task {
 
     public function execute() {
 
+        $processstart = time();
+
         $this->preprocess();
         $this->givestudentnumber();
-        $this->createstudents();
-        $this->createteachers();
-        $this->createstaff();
+        $this->createstudents($processstart);
+        $this->createteachers($processstart);
+        $this->createstaff($processstart);
         $this->postprocess();
     }
 
@@ -191,7 +193,7 @@ class createusers extends \core\task\scheduled_task {
         }
     }
 
-    private function createstudents() {
+    private function createstudents($processstart) {
 
         $xmldoc = new \DOMDocument();
         $xmldoc->load('/home/referentiel/DOKEOS_Etudiants_Inscriptions.xml');
@@ -200,11 +202,11 @@ class createusers extends \core\task\scheduled_task {
 
         foreach ($liststudents as $student) {
 
-            $this->studentline($student);
+            $this->studentline($processstart, $student);
         }
     }
 
-    private function studentline($student) {
+    private function studentline($processstart, $student) {
 
         $studentuid = $student->getAttribute('StudentUID');
 
@@ -231,14 +233,15 @@ class createusers extends \core\task\scheduled_task {
 
                 if ($year == $configyear) {
 
-                    $this->processstudent($studentuid, $idnumber, $firstname,
+                    $this->processstudent($processstart, $studentuid, $idnumber, $firstname,
                             $lastname, $email, $universityyear);
                 }
             }
         }
     }
 
-    private function processstudent($studentuid, $idnumber, $firstname, $lastname, $email, $universityyear) {
+    private function processstudent($processstart, $studentuid, $idnumber, $firstname,
+            $lastname, $email, $universityyear) {
 
         global $DB;
 
@@ -257,51 +260,59 @@ class createusers extends \core\task\scheduled_task {
                     $DB->update_record('local_usercreation_twins', $twin);
                 }
 
-                $this->updateuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
+                $this->updateuser($processstart, 'localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
             } else {
 
                 // Doublon.
 
-                if ($DB->record_exists('local_usercreation_twins', array('username' => $studentuid))) {
+                if ($user->timemodified < $processstart) {
 
-                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $studentuid));
-
-                    if ($twin->fixed == 1) {
-
-                        $twin->fixed = 2;
-
-                        $DB->update_record('local_usercreation_twins', $twin);
-                        $this->updateuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
-
-                        // Pour chaque inscription de l'utilisateur sur l'année actuelle.
-                        $this->yearenrolments($universityyear, $user);
-
-                        return null;
-                    }
-                    $twin->fixed = 0;
-
-                    $DB->update_record('local_usercreation_twins', $twin);
+                    $this->updateuser($processstart, 'localstudent', $studentuid, $idnumber,
+                            $firstname, $lastname, $email);
                 } else {
 
-                    $twin = new \stdClass();
-                    $twin->username = $studentuid;
-                    $twin->fixed = 0;
+                    if ($DB->record_exists('local_usercreation_twins', array('username' => $studentuid))) {
 
-                    $DB->insert_record('local_usercreation_twins', $twin);
+                        $twin = $DB->get_record('local_usercreation_twins', array('username' => $studentuid));
+
+                        if ($twin->fixed == 1) {
+
+                            $twin->fixed = 2;
+
+                            $DB->update_record('local_usercreation_twins', $twin);
+                            $this->updateuser($processstart, 'localstudent', $studentuid, $idnumber,
+                                    $firstname, $lastname, $email);
+
+                            // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+                            $this->yearenrolments($universityyear, $user);
+
+                            return null;
+                        }
+                        $twin->fixed = 0;
+
+                        $DB->update_record('local_usercreation_twins', $twin);
+                    } else {
+
+                        $twin = new \stdClass();
+                        $twin->username = $studentuid;
+                        $twin->fixed = 0;
+
+                        $DB->insert_record('local_usercreation_twins', $twin);
+                    }
                 }
 
                 return null;
             }
         } else {
 
-            $user = $this->newuser('localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
+            $user = $this->newuser($processstart, 'localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
         }
 
         // Pour chaque inscription de l'utilisateur sur l'année actuelle.
         $this->yearenrolments($universityyear, $user);
     }
 
-    private function updateuser($rolename, $username, $idnumber, $firstname, $lastname, $email) {
+    private function updateuser($processstart, $rolename, $username, $idnumber, $firstname, $lastname, $email) {
 
         global $DB;
         $userdata = $DB->get_record('user', array('username' => $username));
@@ -309,6 +320,7 @@ class createusers extends \core\task\scheduled_task {
         $userdata->lastname = $lastname;
         $userdata->idnumber = $idnumber;
         $userdata->email = $email;
+        $userdata->timemodified = $processstart;
         $DB->update_record('user', $userdata);
 
         $systemcontext = \context_system::instance();
@@ -322,7 +334,7 @@ class createusers extends \core\task\scheduled_task {
         }
     }
 
-    private function newuser($rolename, $studentuid, $idnumber, $firstname, $lastname, $email) {
+    private function newuser($processstart, $rolename, $studentuid, $idnumber, $firstname, $lastname, $email) {
 
         global $DB;
         $user = new \stdClass();
@@ -335,8 +347,8 @@ class createusers extends \core\task\scheduled_task {
         $user->lastname = $lastname;
         $user->firstname = $firstname;
         $user->idnumber = $idnumber;
-        $user->timecreated = time();
-        $user->timemodified = time();
+        $user->timecreated = $processstart;
+        $user->timemodified = $processstart;
         $user->lang = 'fr';
         $user->id = $DB->insert_record('user', $user);
         echo "Nouveau $rolename : $firstname $lastname ($studentuid, $idnumber)\n";
@@ -399,7 +411,7 @@ class createusers extends \core\task\scheduled_task {
         }
     }
 
-    private function createteachers() {
+    private function createteachers($processstart) {
 
         $xmldoc = new \DOMDocument();
         $xmldoc->load('/home/referentiel/DOKEOS_Enseignants_Affectations.xml');
@@ -408,11 +420,11 @@ class createusers extends \core\task\scheduled_task {
 
         foreach ($listteachers as $teacher) {
 
-            $this->teacherline($teacher);
+            $this->teacherline($processstart, $teacher);
         }
     }
 
-    private function teacherline($teacher) {
+    private function teacherline($processstart, $teacher) {
 
         global $DB;
 
@@ -454,14 +466,14 @@ class createusers extends \core\task\scheduled_task {
                 if ($position != 'Sursitaire' && $position != "") {
 
                     echo 'position : '.$position."\n";
-                    $this->processteacher($teacheruid, $idnumber, $firstname, $lastname,
+                    $this->processteacher($processstart, $teacheruid, $idnumber, $firstname, $lastname,
                             $email, $affectation, $teacher);
                 }
             }
         }
     }
 
-    private function processteacher($teacheruid, $idnumber, $firstname, $lastname,
+    private function processteacher($processstart, $teacheruid, $idnumber, $firstname, $lastname,
             $email, $affectation, $teacher) {
 
         global $DB;
@@ -481,45 +493,53 @@ class createusers extends \core\task\scheduled_task {
                     $DB->update_record('local_usercreation_twins', $twin);
                 }
 
-                $this->updateuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
+                $this->updateuser($processstart, 'localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
             } else {
 
                 // Doublon.
 
-                if ($DB->record_exists('local_usercreation_twins', array('username' => $teacheruid))) {
+                if ($user->timemodified < $processstart) {
 
-                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $teacheruid));
-
-                    if ($twin->fixed == 1) {
-
-                        $twin->fixed = 2;
-
-                        $DB->update_record('local_usercreation_twins', $twin);
-                        $this->updateuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
-
-                        // Pour chaque inscription de l'utilisateur sur l'année actuelle.
-                        $this->teachersync($affectation, $teacher);
-
-                        return null;
-                    }
-
-                    $twin->fixed = 0;
-
-                    $DB->update_record('local_usercreation_twins', $twin);
+                    $this->updateuser($processstart, 'localteacher', $teacheruid, $idnumber,
+                            $firstname, $lastname, $email);
                 } else {
 
-                    $twin = new \stdClass();
-                    $twin->username = $teacheruid;
-                    $twin->fixed = 0;
+                    if ($DB->record_exists('local_usercreation_twins', array('username' => $teacheruid))) {
 
-                    $DB->insert_record('local_usercreation_twins', $twin);
+                        $twin = $DB->get_record('local_usercreation_twins', array('username' => $teacheruid));
+
+                        if ($twin->fixed == 1) {
+
+                            $twin->fixed = 2;
+
+                            $DB->update_record('local_usercreation_twins', $twin);
+                            $this->updateuser($processstart, 'localteacher', $teacheruid, $idnumber, $firstname,
+                                    $lastname, $email);
+
+                            // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+                            $this->teachersync($affectation, $teacher);
+
+                            return null;
+                        }
+
+                        $twin->fixed = 0;
+
+                        $DB->update_record('local_usercreation_twins', $twin);
+                    } else {
+
+                        $twin = new \stdClass();
+                        $twin->username = $teacheruid;
+                        $twin->fixed = 0;
+
+                        $DB->insert_record('local_usercreation_twins', $twin);
+                    }
                 }
 
                 return null;
             }
         } else {
 
-            $user = $this->newuser('localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
+            $user = $this->newuser($processstart, 'localteacher', $teacheruid, $idnumber, $firstname, $lastname, $email);
         }
 
         // Pour chaque inscription de l'utilisateur sur l'année actuelle.
@@ -595,7 +615,7 @@ class createusers extends \core\task\scheduled_task {
         }
     }
 
-    private function createstaff() {
+    private function createstaff($processstart) {
 
         $xmldoc = new \DOMDocument();
         $xmldoc->load('/home/referentiel/sefiap_personnel_composante.xml');
@@ -604,11 +624,11 @@ class createusers extends \core\task\scheduled_task {
 
         foreach ($liststaff as $staff) {
 
-            $this->staffline($staff);
+            $this->staffline($processstart, $staff);
         }
     }
 
-    private function staffline ($staff) {
+    private function staffline ($processstart, $staff) {
 
         global $DB;
 
@@ -637,11 +657,11 @@ class createusers extends \core\task\scheduled_task {
             $lastname = $this->nameprocessor(strtolower($staff->getAttribute('NOM_USUEL')));
             $firstname = $this->nameprocessor(strtolower($staff->getAttribute('PRENOM')));
 
-            $this->processstaff($staffuid, $idnumber, $firstname, $lastname, $email);
+            $this->processstaff($processstart, $staffuid, $idnumber, $firstname, $lastname, $email);
         }
     }
 
-    private function processstaff($staffuid, $idnumber, $firstname, $lastname, $email) {
+    private function processstaff($processstart, $staffuid, $idnumber, $firstname, $lastname, $email) {
 
         global $DB;
 
@@ -660,42 +680,49 @@ class createusers extends \core\task\scheduled_task {
                         $DB->update_record('local_usercreation_twins', $twin);
                 }
 
-                $this->updateuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
+                $this->updateuser($processstart, 'localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
             } else {
 
                 // Doublon.
 
-                if ($DB->record_exists('local_usercreation_twins', array('username' => $staffuid))) {
+                if ($user->timemodified < $processstart) {
 
-                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $staffuid));
-
-                    if ($twin->fixed == 1) {
-
-                            $twin->fixed = 2;
-
-                            $DB->update_record('local_usercreation_twins', $twin);
-                            $this->updateuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
-
-                            return null;
-                    }
-
-                    $twin->fixed = 0;
-
-                    $DB->update_record('local_usercreation_twins', $twin);
+                    $this->updateuser($processstart, 'localstaff', $staffuid, $idnumber, $firstname,
+                                        $lastname, $email);
                 } else {
 
-                    $twin = new \stdClass();
-                    $twin->username = $staffuid;
-                    $twin->fixed = 0;
+                    if ($DB->record_exists('local_usercreation_twins', array('username' => $staffuid))) {
 
-                    $DB->insert_record('local_usercreation_twins', $twin);
+                        $twin = $DB->get_record('local_usercreation_twins', array('username' => $staffuid));
+
+                        if ($twin->fixed == 1) {
+
+                                $twin->fixed = 2;
+
+                                $DB->update_record('local_usercreation_twins', $twin);
+                                $this->updateuser($processstart, 'localstaff', $staffuid, $idnumber, $firstname,
+                                        $lastname, $email);
+
+                                return null;
+                        }
+
+                        $twin->fixed = 0;
+
+                        $DB->update_record('local_usercreation_twins', $twin);
+                    } else {
+
+                        $twin = new \stdClass();
+                        $twin->username = $staffuid;
+                        $twin->fixed = 0;
+
+                        $DB->insert_record('local_usercreation_twins', $twin);
+                    }
                 }
-
                 return null;
             }
         } else {
 
-            $user = $this->newuser('localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
+            $user = $this->newuser($processstart, 'localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
         }
     }
 
