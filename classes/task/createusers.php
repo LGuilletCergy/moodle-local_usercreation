@@ -554,26 +554,30 @@ class createusers extends \core\task\scheduled_task {
 
         $teacherdata = $DB->get_record('user', array('username' => $teacher->getAttribute('StaffUID')));
 
-        $codestructure = $affectation->getAttribute('CodeStructure');
 
-        if (isset($codestructure)) {
+        /* Commenté pour le passage à la nouvelle année car la structure du fichier DOKEOS change */
 
-            $ufrcode = substr($codestructure, 0, 1);
-            if (!$DB->record_exists('local_usercreation_ufr',
-                    array('userid' => $teacherdata->id, 'ufrcode' => $ufrcode))) {
-
-                $ufrteacher = array();
-                $ufrteacher['userid'] = $teacherdata->id;
-                $ufrteacher['ufrcode'] = $ufrcode;
-                $DB->insert_record('local_usercreation_ufr', $ufrteacher);
-                if ($DB->record_exists('local_usercreation_ufr',
-                        array('userid' => $teacherdata->id, 'ufrcode' => '-1'))) {
-
-                    $DB->delete_record('local_usercreation_ufr',
-                            array('userid' => $teacherdata->id, 'ufrcode' => '-1'));
-                }
-            }
-        }
+        
+//        $codestructure = $affectation->getAttribute('CodeStructure');
+//
+//        if (isset($codestructure)) {
+//
+//            $ufrcode = substr($codestructure, 0, 1);
+//            if (!$DB->record_exists('local_usercreation_ufr',
+//                    array('userid' => $teacherdata->id, 'ufrcode' => $ufrcode))) {
+//
+//                $ufrteacher = array();
+//                $ufrteacher['userid'] = $teacherdata->id;
+//                $ufrteacher['ufrcode'] = $ufrcode;
+//                $DB->insert_record('local_usercreation_ufr', $ufrteacher);
+//                if ($DB->record_exists('local_usercreation_ufr',
+//                        array('userid' => $teacherdata->id, 'ufrcode' => '-1'))) {
+//
+//                    $DB->delete_record('local_usercreation_ufr',
+//                            array('userid' => $teacherdata->id, 'ufrcode' => '-1'));
+//                }
+//            }
+//        }
 
         if (!$DB->record_exists('local_usercreation_ufr', array('userid' => $teacherdata->id))) {
 
