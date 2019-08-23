@@ -113,6 +113,9 @@ function local_usercreation_extend_navigation(global_navigation $nav) {
 
                     if ($teacher->getAttribute('StaffUID') == $USER->username) {
 
+                        // Changer ça pour que soit récupéré le numéro ETU si il y en a un
+                            // Vérifier avant de faire ça que c'est bien le comportement de la création d'utilisateur
+
                         // Récupérer les infos et envoyer le mail.
 
                         $username = $teacher->getAttribute('StaffUID');
