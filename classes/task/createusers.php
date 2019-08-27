@@ -249,6 +249,11 @@ class createusers extends \core\task\scheduled_task {
 
         if ($user) {
 
+            // Si il n'est pas étudiant de l'établissement, lui donner le rôle.
+            // Peut se produire si l'étudiant se connecte avant la création de son compte.
+
+            $this->givesystemrole($user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname);
+
             if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
@@ -351,11 +356,22 @@ class createusers extends \core\task\scheduled_task {
         $user->timemodified = $processstart;
         $user->lang = 'fr';
         $user->id = $DB->insert_record('user', $user);
-        echo "Nouveau $rolename : $firstname $lastname ($studentuid, $idnumber)\n";
+        $this->givesystemrole($user->id, $rolename, $studentuid, $idnumber, $firstname, $lastname);
+        return $user;
+    }
+
+    private function givesystemrole($userid, $rolename, $studentuid, $idnumber, $firstname, $lastname) {
+
+        global $DB;
+
         $role = $DB->get_record('role', array('shortname' => $rolename));
         $systemcontext = \context_system::instance();
-        role_assign($role->id, $user->id, $systemcontext->id);
-        return $user;
+
+        if (!$DB->record_exists('role_assignments', array('roleid' => $role->id, 'contextid' => $systemcontext->id))) {
+
+            role_assign($role->id, $userid, $systemcontext->id);
+            echo "Nouveau $rolename : $firstname $lastname ($studentuid, $idnumber)\n";
+        }
     }
 
     private function yearenrolments($universityyear, $user) {
@@ -482,6 +498,11 @@ class createusers extends \core\task\scheduled_task {
 
             $user = $DB->get_record('user', array('username' => $teacheruid));
 
+            // Si il n'est pas enseignant de l'établissement, lui donner le rôle.
+            // Peut se produire si l'enseignant se connecte avant la création de son compte.
+
+            $this->givesystemrole($user->id, 'localteacher', $teacheruid, $idnumber, $firstname, $lastname);
+
             if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
@@ -557,7 +578,7 @@ class createusers extends \core\task\scheduled_task {
 
         /* Commenté pour le passage à la nouvelle année car la structure du fichier DOKEOS change */
 
-        
+
 //        $codestructure = $affectation->getAttribute('CodeStructure');
 //
 //        if (isset($codestructure)) {
@@ -672,6 +693,11 @@ class createusers extends \core\task\scheduled_task {
         if ($DB->record_exists('user', array('username' => $staffuid))) {
 
             $user = $DB->get_record('user', array('username' => $staffuid));
+
+            // Si il n'est pas personnel de l'établissement, lui donner le rôle.
+            // Peut se produire si le personnel se connecte avant la création de son compte.
+
+            $this->givesystemrole($user->id, 'localstaff', $staffuid, $idnumber, $firstname, $lastname);
 
             if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
