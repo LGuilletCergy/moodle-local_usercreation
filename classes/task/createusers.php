@@ -251,7 +251,7 @@ class createusers extends \core\task\scheduled_task {
 
             // Si il n'est pas étudiant de l'établissement, lui donner le rôle.
             // Peut se produire si l'étudiant se connecte avant la création de son compte.
-
+            
             echo "$user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname\n";
 
             $this->givesystemrole($user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname);
