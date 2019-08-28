@@ -53,6 +53,7 @@ class createusers extends \core\task\scheduled_task {
         $this->preprocess();
         $this->givestudentnumber();
         $this->createstudents($processstart);
+        exit;
         $this->createteachers($processstart);
         $this->createstaff($processstart);
         $this->postprocess();
@@ -204,6 +205,8 @@ class createusers extends \core\task\scheduled_task {
 
             $this->studentline($processstart, $student);
         }
+
+        exit;
     }
 
     private function studentline($processstart, $student) {
@@ -251,6 +254,8 @@ class createusers extends \core\task\scheduled_task {
 
             // Si il n'est pas étudiant de l'établissement, lui donner le rôle.
             // Peut se produire si l'étudiant se connecte avant la création de son compte.
+
+            echo "$user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname\n";
 
             $this->givesystemrole($user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname);
 
@@ -367,11 +372,17 @@ class createusers extends \core\task\scheduled_task {
         $role = $DB->get_record('role', array('shortname' => $rolename));
         $systemcontext = \context_system::instance();
 
+        echo "Test 1\n";
+
         if (!$DB->record_exists('role_assignments', array('roleid' => $role->id, 'contextid' => $systemcontext->id))) {
 
+
+            echo "Test 2\n";
             role_assign($role->id, $userid, $systemcontext->id);
             echo "Nouveau $rolename : $firstname $lastname ($studentuid, $idnumber)\n";
         }
+
+        echo "Test 3\n";
     }
 
     private function yearenrolments($universityyear, $user) {
