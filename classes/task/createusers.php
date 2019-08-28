@@ -51,9 +51,8 @@ class createusers extends \core\task\scheduled_task {
         $processstart = time();
 
         $this->preprocess();
-        //$this->givestudentnumber();
+        $this->givestudentnumber();
         $this->createstudents($processstart);
-        exit;
         $this->createteachers($processstart);
         $this->createstaff($processstart);
         $this->postprocess();
@@ -257,8 +256,6 @@ class createusers extends \core\task\scheduled_task {
 
             $this->givesystemrole($user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname);
 
-            exit;
-
             if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
                 // Même utilisateur.
@@ -372,17 +369,11 @@ class createusers extends \core\task\scheduled_task {
         $role = $DB->get_record('role', array('shortname' => $rolename));
         $systemcontext = \context_system::instance();
 
-        echo "Test 1\n";
-
         if (!$DB->record_exists('role_assignments', array('roleid' => $role->id, 'contextid' => $systemcontext->id))) {
 
-
-            echo "Test 2\n";
             role_assign($role->id, $userid, $systemcontext->id);
             echo "Nouveau $rolename : $firstname $lastname ($studentuid, $idnumber)\n";
         }
-
-        echo "Test 3\n";
     }
 
     private function yearenrolments($universityyear, $user) {
