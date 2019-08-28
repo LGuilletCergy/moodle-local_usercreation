@@ -205,8 +205,6 @@ class createusers extends \core\task\scheduled_task {
 
             $this->studentline($processstart, $student);
         }
-
-        exit;
     }
 
     private function studentline($processstart, $student) {
@@ -258,6 +256,8 @@ class createusers extends \core\task\scheduled_task {
             echo "$user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname\n";
 
             $this->givesystemrole($user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname);
+
+            exit;
 
             if ($user->idnumber == $idnumber || $user->idnumber == "") {
 
