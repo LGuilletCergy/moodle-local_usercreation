@@ -371,7 +371,8 @@ class createusers extends \core\task\scheduled_task {
         $role = $DB->get_record('role', array('shortname' => $rolename));
         $systemcontext = \context_system::instance();
 
-        if (!$DB->record_exists('role_assignments', array('roleid' => $role->id, 'contextid' => $systemcontext->id))) {
+        if (!$DB->record_exists('role_assignments',
+                array('roleid' => $role->id, 'contextid' => $systemcontext->id, 'userid' => $userid))) {
 
             role_assign($role->id, $userid, $systemcontext->id);
             echo "Nouveau $rolename : $firstname $lastname ($studentuid, $idnumber)\n";
