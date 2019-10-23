@@ -776,7 +776,7 @@ class createusers extends \core\task\scheduled_task {
 
         if (!$student->hasAttribute('StudentUIDGE') && $student->hasAttribute('StudentUIDEisti')) {
 
-            $studentuid = $student->getAttribute('StudentUIDEisti');
+            $studentuid = 'i-'.$student->getAttribute('StudentUIDEisti');
 
             echo 'StudentUIDEisti = '.$studentuid."\n";
 
