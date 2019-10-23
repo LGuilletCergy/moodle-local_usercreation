@@ -915,7 +915,6 @@ class createusers extends \core\task\scheduled_task {
         $user->mnethostid = 1;
         $user->email = $email;
         $user->username = $studentuid;
-        $user->password = '';
         $user->lastname = $lastname;
         $user->firstname = $firstname;
         $user->idnumber = $idnumber;
