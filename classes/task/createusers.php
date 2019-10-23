@@ -38,6 +38,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot .'/course/lib.php');
 require_once($CFG->libdir .'/filelib.php');
 require_once($CFG->libdir .'/accesslib.php');
+require_once($CFG->libdir .'/user/lib.php');
 
 class createusers extends \core\task\scheduled_task {
 
