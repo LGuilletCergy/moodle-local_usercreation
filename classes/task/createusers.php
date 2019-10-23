@@ -55,6 +55,7 @@ class createusers extends \core\task\scheduled_task {
         $this->createstudents($processstart);
         $this->createteachers($processstart);
         $this->createstaff($processstart);
+        $this->createstudentseisti($processstart);
         $this->postprocess();
     }
 
@@ -251,7 +252,7 @@ class createusers extends \core\task\scheduled_task {
 
             // Si il n'est pas étudiant de l'établissement, lui donner le rôle.
             // Peut se produire si l'étudiant se connecte avant la création de son compte.
-            
+
             echo "$user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname\n";
 
             $this->givesystemrole($user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname);
@@ -756,6 +757,179 @@ class createusers extends \core\task\scheduled_task {
 
             $user = $this->newuser($processstart, 'localstaff', $staffuid, $idnumber, $firstname, $lastname, $email);
         }
+    }
+
+    private function createstudentseisti($processstart) {
+
+        $xmldoc = new \DOMDocument();
+        $xmldoc->load('/home/referentiel/DOKEOS_Etudiants_Inscriptions_eisti.xml');
+        $xpathvar = new \Domxpath($xmldoc);
+        $liststudents = $xpathvar->query('//Student');
+
+        foreach ($liststudents as $student) {
+
+            $this->studentlineeisti($processstart, $student);
+        }
+    }
+
+    private function studentlineeisti($processstart, $student) {
+
+        if (!$student->hasAttribute('StudentUIDGE') && $student->hasAttribute('StudentUIDEisti')) {
+
+            $studentuid = $student->getAttribute('StudentUIDEisti');
+
+            echo 'StudentUIDEisti = '.$studentuid."\n";
+
+            $email = $student->getAttribute('StudentEmailEisti');
+            $idnumber = $student->getAttribute('StudentETUEisti');
+            $lastname = $this->nameprocessor(strtolower($student->getAttribute('StudentName')));
+            $firstname = $this->nameprocessor(strtolower($student->getAttribute('StudentFirstName')));
+            $universityyears = $student->childNodes;
+
+            foreach ($universityyears as $universityyear) {
+
+                if ($universityyear->nodeType !== 1 ) {
+
+                    continue;
+                }
+
+                // Si l'utilisateur est inscrit à l'université pendant l'année en cours, on traite son cas.
+                $year = $universityyear->getAttribute('AnneeUniv');
+                $configyear = get_config('local_usercreation', 'year');
+
+                if ($year == $configyear) {
+
+                    $processstudenteisti = false;
+
+                    $yearenrolments = $universityyear->childNodes;
+
+                    foreach ($yearenrolments as $yearenrolment) {
+
+                        if ($yearenrolment->nodeType !== 1 ) {
+
+                            continue;
+                        }
+
+                        if ($yearenrolment->getAttribute('CodeCycle') == 'c0_bachelor01' ||
+                                $yearenrolment->getAttribute('CodeCycle') == 'c0_bachelor02') {
+
+                            $processstudenteisti = true;
+                        }
+                    }
+
+                    if ($processstudenteisti == true) {
+
+                        $this->processstudenteisti($processstart, $studentuid, $idnumber, $firstname,
+                            $lastname, $email, $universityyear);
+                    }
+                }
+            }
+        }
+    }
+
+    private function processstudenteisti($processstart, $studentuid, $idnumber, $firstname,
+            $lastname, $email, $universityyear) {
+
+        global $DB;
+
+        $user = $DB->get_record('user', array('username' => $studentuid));
+
+        if ($user) {
+
+            // Si il n'est pas étudiant de l'établissement, lui donner le rôle.
+            // Peut se produire si l'étudiant se connecte avant la création de son compte.
+            // Probablement pas ici pour l'EISTI mais ça ne devrait pas faire de mal de garder.
+
+            echo "$user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname\n";
+
+            $this->givesystemrole($user->id, 'localstudent', $studentuid, $idnumber, $firstname, $lastname);
+
+            if ($user->idnumber == $idnumber || $user->idnumber == "") {
+
+                // Même utilisateur.
+
+                if ($DB->record_exists('local_usercreation_twins', array('username' => $studentuid))) {
+
+                    $twin = $DB->get_record('local_usercreation_twins', array('username' => $studentuid));
+                    $twin->fixed = 2;
+                    $DB->update_record('local_usercreation_twins', $twin);
+                }
+
+                $this->updateuser($processstart, 'localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
+            } else {
+
+                // Doublon.
+
+                if ($user->timemodified < $processstart) {
+
+                    $this->updateuser($processstart, 'localstudent', $studentuid, $idnumber,
+                            $firstname, $lastname, $email);
+                } else {
+
+                    if ($DB->record_exists('local_usercreation_twins', array('username' => $studentuid))) {
+
+                        $twin = $DB->get_record('local_usercreation_twins', array('username' => $studentuid));
+
+                        if ($twin->fixed == 1) {
+
+                            $twin->fixed = 2;
+
+                            $DB->update_record('local_usercreation_twins', $twin);
+                            $this->updateuser($processstart, 'localstudent', $studentuid, $idnumber,
+                                    $firstname, $lastname, $email);
+
+                            // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+                            $this->yearenrolments($universityyear, $user);
+
+                            return null;
+                        }
+                        $twin->fixed = 0;
+
+                        $DB->update_record('local_usercreation_twins', $twin);
+                    } else {
+
+                        $twin = new \stdClass();
+                        $twin->username = $studentuid;
+                        $twin->fixed = 0;
+
+                        $DB->insert_record('local_usercreation_twins', $twin);
+                    }
+                }
+
+                return null;
+            }
+        } else {
+
+            $user = $this->newusereisti($processstart, 'localstudent', $studentuid, $idnumber,
+                    $firstname, $lastname, $email);
+        }
+    }
+
+    private function newusereisti($processstart, $rolename, $studentuid, $idnumber, $firstname, $lastname, $email) {
+
+        global $DB;
+        $user = new \stdClass();
+        $user->auth = 'manual';
+        $user->confirmed = 1;
+        $user->mnethostid = 1;
+        $user->email = $email;
+        $user->username = $studentuid;
+        $user->password = '';
+        $user->lastname = $lastname;
+        $user->firstname = $firstname;
+        $user->idnumber = $idnumber;
+        $user->timecreated = $processstart;
+        $user->timemodified = $processstart;
+        $user->lang = 'fr';
+
+        $user->id = user_create_user($user);
+
+        $newuser = $DB->get_record('user', array('id' => $user->id));
+
+        setnew_password_and_mail($newuser);
+
+        $this->givesystemrole($user->id, $rolename, $studentuid, $idnumber, $firstname, $lastname);
+        return $user;
     }
 
     private function postprocess() {
