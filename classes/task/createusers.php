@@ -776,7 +776,8 @@ class createusers extends \core\task\scheduled_task {
 
     private function studentlineeisti($processstart, $student) {
 
-        if (!$student->hasAttribute('StudentUIDGE') && $student->hasAttribute('StudentUIDEisti')) {
+        if (!$student->hasAttribute('StudentUIDGE') && $student->hasAttribute('StudentUIDEisti')
+                && $student->hasAttribute('StudentName') && $student->hasAttribute('StudentFirstName')) {
 
             $studentuid = 'i-'.$student->getAttribute('StudentUIDEisti');
 
@@ -945,7 +946,9 @@ class createusers extends \core\task\scheduled_task {
 
     private function nameprocessor($name) {
 
-        $lowername = strtolower($name);
+        $newname = str_replace(',', '', $name);
+
+        $lowername = strtolower($newname);
         $tabname = explode('-', $lowername);
         $processedname = "";
 
