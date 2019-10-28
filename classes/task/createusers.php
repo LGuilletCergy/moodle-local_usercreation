@@ -960,6 +960,7 @@ class createusers extends \core\task\scheduled_task {
                 $codeetapeyear = "Y$year-$codeetape";
                 $ufrcode = substr($codeetape, 0, 1);
                 $ufrcodeyear = "Y$year-$ufrcode";
+                $vetname = 'BACHELOR Y EAD 1';
 
                 // Si cette inscription de l'utilisateur à cette composante
                 // n'est pas encore dans mdl_local_ufrstudent, on l'y ajoute.
@@ -987,7 +988,7 @@ class createusers extends \core\task\scheduled_task {
                     $studentvetrecord = new \stdClass();
                     $studentvetrecord->studentid = $user->id;
                     $studentvetrecord->vetcode = $codeetapeyear;
-                    $studentvetrecord->vetname = $yearenrolment->getAttribute('LibEtape');
+                    $studentvetrecord->vetname = $vetname;
                     $DB->insert_record('local_usercreation_vet', $studentvetrecord);
                 } else {
 
@@ -1004,6 +1005,7 @@ class createusers extends \core\task\scheduled_task {
                 $codeetapeyear = "Y$year-$codeetape";
                 $ufrcode = substr($codeetape, 0, 1);
                 $ufrcodeyear = "Y$year-$ufrcode";
+                $vetname = 'BACHELOR Y EAD 2';
 
                 // Si cette inscription de l'utilisateur à cette composante
                 // n'est pas encore dans mdl_local_ufrstudent, on l'y ajoute.
@@ -1031,7 +1033,7 @@ class createusers extends \core\task\scheduled_task {
                     $studentvetrecord = new \stdClass();
                     $studentvetrecord->studentid = $user->id;
                     $studentvetrecord->vetcode = $codeetapeyear;
-                    $studentvetrecord->vetname = $yearenrolment->getAttribute('LibEtape');
+                    $studentvetrecord->vetname = $vetname;
                     $DB->insert_record('local_usercreation_vet', $studentvetrecord);
                 } else {
 
