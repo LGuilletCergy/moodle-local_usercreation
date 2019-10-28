@@ -52,10 +52,10 @@ class createusers extends \core\task\scheduled_task {
         $processstart = time();
 
         $this->preprocess();
-        $this->givestudentnumber();
-        $this->createstudents($processstart);
-        $this->createteachers($processstart);
-        $this->createstaff($processstart);
+//        $this->givestudentnumber();
+//        $this->createstudents($processstart);
+//        $this->createteachers($processstart);
+//        $this->createstaff($processstart);
         $this->createstudentseisti($processstart);
         $this->postprocess();
     }
@@ -270,6 +270,9 @@ class createusers extends \core\task\scheduled_task {
                 }
 
                 $this->updateuser($processstart, 'localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
+
+                // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+                $this->yearenrolments($universityyear, $user);
             } else {
 
                 // Doublon.
@@ -859,6 +862,9 @@ class createusers extends \core\task\scheduled_task {
                 }
 
                 $this->updateuser($processstart, 'localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
+
+                // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+                $this->yearenrolmentseisti($universityyear, $user);
             } else {
 
                 // Doublon.
@@ -882,7 +888,7 @@ class createusers extends \core\task\scheduled_task {
                                     $firstname, $lastname, $email);
 
                             // Pour chaque inscription de l'utilisateur sur l'année actuelle.
-                            $this->yearenrolments($universityyear, $user);
+                            $this->yearenrolmentseisti($universityyear, $user);
 
                             return null;
                         }
@@ -932,6 +938,110 @@ class createusers extends \core\task\scheduled_task {
 
         $this->givesystemrole($user->id, $rolename, $studentuid, $idnumber, $firstname, $lastname);
         return $user;
+    }
+
+    private function yearenrolmentseisti($universityyear, $user) {
+
+        global $DB;
+        $yearenrolments = $universityyear->childNodes;
+        $year = $universityyear->getAttribute('AnneeUniv');
+        foreach ($yearenrolments as $yearenrolment) {
+
+            if ($yearenrolment->nodeType !== 1 ) {
+
+                continue;
+            }
+
+            $codecycle = $yearenrolment->getAttribute('CodeCycle');
+
+            if ($codecycle == 'c0_bachelor01') {
+
+                $codeetape = '5C32A1';
+                $codeetapeyear = "Y$year-$codeetape";
+                $ufrcode = substr($codeetape, 0, 1);
+                $ufrcodeyear = "Y$year-$ufrcode";
+
+                // Si cette inscription de l'utilisateur à cette composante
+                // n'est pas encore dans mdl_local_ufrstudent, on l'y ajoute.
+
+                if (!$DB->record_exists('local_usercreation_ufr',
+                        array('userid' => $user->id, 'ufrcode' => $ufrcodeyear))) {
+
+                    $ufrrecord = new \stdClass();
+                    $ufrrecord->userid = $user->id;
+                    $ufrrecord->ufrcode = $ufrcodeyear;
+                    $DB->insert_record('local_usercreation_ufr', $ufrrecord);
+                } else {
+
+                    $ufrrecord = $DB->get_record('local_usercreation_ufr', array('userid' => $user->id,
+                        'ufrcode' => $ufrcodeyear));
+                    $ufrrecord->stillexists = 1;
+                    $DB->update_record('local_usercreation_ufr', $ufrrecord);
+                }
+
+                // Idem pour la VET.
+
+                if (!$DB->record_exists('local_usercreation_vet', array('studentid' => $user->id,
+                    'vetcode' => $codeetapeyear))) {
+
+                    $studentvetrecord = new \stdClass();
+                    $studentvetrecord->studentid = $user->id;
+                    $studentvetrecord->vetcode = $codeetapeyear;
+                    $studentvetrecord->vetname = $yearenrolment->getAttribute('LibEtape');
+                    $DB->insert_record('local_usercreation_vet', $studentvetrecord);
+                } else {
+
+                    $vetrecord = $DB->get_record('local_usercreation_vet', array('studentid' => $user->id,
+                        'vetcode' => $codeetapeyear));
+                    $vetrecord->stillexists = 1;
+                    $DB->update_record('local_usercreation_vet', $vetrecord);
+                }
+            }
+
+            if ($codecycle == 'c0_bachelor02') {
+
+                $codeetape = '5C32A2';
+                $codeetapeyear = "Y$year-$codeetape";
+                $ufrcode = substr($codeetape, 0, 1);
+                $ufrcodeyear = "Y$year-$ufrcode";
+
+                // Si cette inscription de l'utilisateur à cette composante
+                // n'est pas encore dans mdl_local_ufrstudent, on l'y ajoute.
+
+                if (!$DB->record_exists('local_usercreation_ufr',
+                        array('userid' => $user->id, 'ufrcode' => $ufrcodeyear))) {
+
+                    $ufrrecord = new \stdClass();
+                    $ufrrecord->userid = $user->id;
+                    $ufrrecord->ufrcode = $ufrcodeyear;
+                    $DB->insert_record('local_usercreation_ufr', $ufrrecord);
+                } else {
+
+                    $ufrrecord = $DB->get_record('local_usercreation_ufr', array('userid' => $user->id,
+                        'ufrcode' => $ufrcodeyear));
+                    $ufrrecord->stillexists = 1;
+                    $DB->update_record('local_usercreation_ufr', $ufrrecord);
+                }
+
+                // Idem pour la VET.
+
+                if (!$DB->record_exists('local_usercreation_vet', array('studentid' => $user->id,
+                    'vetcode' => $codeetapeyear))) {
+
+                    $studentvetrecord = new \stdClass();
+                    $studentvetrecord->studentid = $user->id;
+                    $studentvetrecord->vetcode = $codeetapeyear;
+                    $studentvetrecord->vetname = $yearenrolment->getAttribute('LibEtape');
+                    $DB->insert_record('local_usercreation_vet', $studentvetrecord);
+                } else {
+
+                    $vetrecord = $DB->get_record('local_usercreation_vet', array('studentid' => $user->id,
+                        'vetcode' => $codeetapeyear));
+                    $vetrecord->stillexists = 1;
+                    $DB->update_record('local_usercreation_vet', $vetrecord);
+                }
+            }
+        }
     }
 
     private function postprocess() {
