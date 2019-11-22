@@ -52,10 +52,10 @@ class createusers extends \core\task\scheduled_task {
         $processstart = time();
 
         $this->preprocess();
-        $this->givestudentnumber();
-        $this->createstudents($processstart);
-        $this->createteachers($processstart);
-        $this->createstaff($processstart);
+//        $this->givestudentnumber();
+//        $this->createstudents($processstart);
+//        $this->createteachers($processstart);
+//        $this->createstaff($processstart);
         $this->createstudentseisti($processstart);
         $this->postprocess();
     }
