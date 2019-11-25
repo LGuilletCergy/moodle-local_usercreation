@@ -53,9 +53,9 @@ class createusers extends \core\task\scheduled_task {
 
         $this->preprocess();
         $this->givestudentnumber();
-//        $this->createstudents($processstart);
-//        $this->createteachers($processstart);
-//        $this->createstaff($processstart);
+        $this->createstudents($processstart);
+        $this->createteachers($processstart);
+        $this->createstaff($processstart);
         $this->createstudentseisti($processstart);
         $this->postprocess();
     }
@@ -838,11 +838,7 @@ class createusers extends \core\task\scheduled_task {
 
         global $DB;
 
-        echo "Test 1 : $studentuid\n";
-
         $user = $DB->get_record('user', array('username' => $studentuid));
-
-        echo "Test 2 : $user->firstname, $user->firstname, $user->lastname\n";
 
         if ($user) {
 
@@ -963,8 +959,6 @@ class createusers extends \core\task\scheduled_task {
 
             if ($codecycle == 'c0_bachelor01') {
 
-                echo "Bachelor 01 $user->username\n";
-
                 $codeetape = '5C32A1';
                 $codeetapeyear = "Y$year-$codeetape";
                 $ufrcode = substr($codeetape, 0, 1);
@@ -1009,8 +1003,6 @@ class createusers extends \core\task\scheduled_task {
             }
 
             if ($codecycle == 'c0_bachelor02') {
-
-                echo "Bachelor 02 $user->username\n";
 
                 $codeetape = '5C32A2';
                 $codeetapeyear = "Y$year-$codeetape";
