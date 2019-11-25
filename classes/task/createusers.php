@@ -779,7 +779,7 @@ class createusers extends \core\task\scheduled_task {
 
     private function studentlineeisti($processstart, $student) {
 
-        if (!$student->hasAttribute('StudentUIDGE') && $student->hasAttribute('StudentUIDEisti')
+        if ($student->hasAttribute('StudentUIDEisti')
                 && $student->hasAttribute('StudentName') && $student->hasAttribute('StudentFirstName')) {
 
             $studentuid = 'i-'.$student->getAttribute('StudentUIDEisti');
