@@ -318,10 +318,10 @@ class createusers extends \core\task\scheduled_task {
         } else {
 
             $user = $this->newuser($processstart, 'localstudent', $studentuid, $idnumber, $firstname, $lastname, $email);
-        }
 
-        // Pour chaque inscription de l'utilisateur sur l'année actuelle.
-        $this->yearenrolments($universityyear, $user);
+            // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+            $this->yearenrolments($universityyear, $user);
+        }
     }
 
     private function updateuser($processstart, $rolename, $username, $idnumber, $firstname, $lastname, $email) {
@@ -911,6 +911,9 @@ class createusers extends \core\task\scheduled_task {
 
             $user = $this->newusereisti($processstart, 'localstudent', $studentuid, $idnumber,
                     $firstname, $lastname, $email);
+
+            // Pour chaque inscription de l'utilisateur sur l'année actuelle.
+            $this->yearenrolmentseisti($universityyear, $user);
         }
     }
 
