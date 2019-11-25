@@ -838,7 +838,11 @@ class createusers extends \core\task\scheduled_task {
 
         global $DB;
 
+        echo "Test 1 : $studentuid\n";
+
         $user = $DB->get_record('user', array('username' => $studentuid));
+
+        echo "Test 2 : $user->firstname, $user->firstname, $user->lastname\n";
 
         if ($user) {
 
